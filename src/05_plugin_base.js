@@ -76,7 +76,7 @@ Class ("paella.PluginManager", {
 		var This = this;
 		this.foreach(function(plugin,config) {
 			if (config.enabled) {
-				base.log.debug("load plugin " + name);
+				base.log.debug("load plugin " + plugin.getName());
 				plugin.config = config;							
 				if (plugin.type!="eventDriven") {
 					plugin.load(This);
@@ -102,6 +102,8 @@ Class ("paella.PluginManager", {
 					if (config[key]===undefined) config[key] = pluginConfig.defaultConfig[key];
 				}
 			}
+			// #DCE verify what is supposed to load
+			base.log.debug("Plugin number " + i + " " + name + " enabled: " + config.enabled);
 			callback(this.pluginList[i],config);
 		}
 	},

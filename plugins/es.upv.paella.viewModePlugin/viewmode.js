@@ -81,8 +81,12 @@ Class ("paella.plugins.ViewModePlugin",paella.ButtonPlugin,{
 		var prevButtonItem = this.buttonItems[paella.player.selectedProfile];
 		var nextButtonItem = this.buttonItems[profile];
 
-		if (nextButtonItem && prevButtonItem!=nextButtonItem) {
+		// #DCE MATT-473, verify selectedProfile exists
+		if (nextButtonItem && prevButtonItem && prevButtonItem!=nextButtonItem) {
 			prevButtonItem.className = this.getButtonItemClass(paella.player.selectedProfile,false);
+			nextButtonItem.className = this.getButtonItemClass(profile,true);
+			paella.events.trigger(paella.events.setProfile,{profileName:profile});
+		} else if (nextButtonItem && !prevButtonItem) {
 			nextButtonItem.className = this.getButtonItemClass(profile,true);
 			paella.events.trigger(paella.events.setProfile,{profileName:profile});
 		}
