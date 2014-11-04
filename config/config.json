@@ -1,11 +1,13 @@
 {
+    "dceMaxWidth":true,
 	"player":{
+		"defaultProfile": "full",
         "profileFrameStrategy": "paella.ProfileFrameStrategy",
 		"videoQualityStrategy": "paella.BestFitVideoQualityStrategy",
 		"methods":[{"name":"streaming","enabled":true},
 				   {"name":"html","enabled":true},
 				   {"name":"flash","enabled":true},
-                   {"name":"image","enabled":true}],
+                		   {"name":"image","enabled":true}],
         "audio": {
             "master": 1.0,
             "slave": 0.0
@@ -16,9 +18,9 @@
         }
 	},
 	"editor":{
-		"enabled":true
+		"enabled":false
 	},
-	"defaultProfile":"slide_professor",
+        "defaultProfile":"slide_professor",
 	"data":{
 		"enabled":true,
 		"dataDelegates":{
@@ -34,6 +36,17 @@
 		"//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/master/doc/plugins.md",
 		"list":{
 			"//****": "Button Plugins",
+			"ch.ethz.paella.multipleQualitiesPlugin": {"enabled": false},
+			"es.upv.paella.ImageControlPlugin":{"enabled":false},
+			"es.upv.paella.ShowEditorPlugin":{"enabled":false,"alwaysVisible":false},
+			"es.upv.paella.TrimmingPlayerPlugin":{"enabled":false},
+			"es.upv.paella.editor.TrimmingTrackPlugin":{"enabled":false},
+			"es.upv.paella.playPauseButtonPlugin":{"enabled":true},
+			"es.upv.paella.test.videoLoadPlugin":{"enabled":false},
+			"es.upv.paella.test.playbackRate":{"enabled":false},
+			"es.upv.paella.volumeRangePlugin":{"enabled":true, "showMasterVolume": true, "showSlaveVolume": false },
+			"es.upv.paella.userTrackingCollectorPlugIn": {"enabled": true, "heartBeatTime": 5000},
+			"es.upv.paella.repeatButtonPlugin": {"enabled":false},
 			"edu.harvard.dce.paella.flexSkipPlugin": {"enabled":true, "direction": "Rewind", "seconds": 10},
 			"edu.harvard.dce.paella.flexSkipForwardPlugin": {"enabled":true, "direction": "Forward", "seconds": 30},
 			"es.upv.paella.captionsPlugin": {"enabled":true, "searchOnCaptions":true},
@@ -90,6 +103,12 @@
 	},
     "standalone" : {
         "reposiroty": "../repository/"
+ 	},
+    "skin": {
+        "default": "dark",
+        "available": [
+            "dark",
+            "light"
+        ]
     }
 }
-

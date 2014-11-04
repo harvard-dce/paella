@@ -102,6 +102,8 @@ Class ("paella.PluginManager", {
 			if (!config) {
 				config = {enabled: enablePluginsByDefault};
 			}
+			// #DCE verify what is supposed to load
+			base.log.debug("Plugin number " + i + " " + name + " enabled: " + config.enabled);
 			callback(plugin, config);
 		});
 	},
