@@ -76,7 +76,8 @@ Class ("paella.plugins.ActiveCaptionsPlugin",paella.ButtonPlugin,{
 
 		if (newLang != '')
 			paella.data.read('captions',{id:paella.initDelegate.getId(),lang:newLang ,op:'caption'},function(data, status) {
-				if (data && typeof(data)=='object' && (data.error === false)) {
+				//#DCE add check for data.error before evaluating
+				if (data && typeof(data)=='object' && data.error && (data.error === false)) {
 					if (data.captions && data.captions.length>0) {
 						paella.plugins.captionsPlayerlugin.setCaptions(data.captions);
 						paella.plugins.captionsPlayerlugin.enable();
