@@ -90,7 +90,7 @@ Class ("paella.VideoElementBase", paella.DomNode,{
 	callReadyEvent:function() {
 		paella.events.trigger(paella.events.singleVideoReady, { sender:this });
 	},
-	
+
 	callUnloadEvent:function() {
 		paella.events.trigger(paella.events.singleVideoUnloaded, { sender:this });
 	},
@@ -151,7 +151,7 @@ Class ("paella.VideoElementBase", paella.DomNode,{
 	unload:function() {
 		this.callUnloadEvent();
 	},
-	
+
 	setClassName:function(className) {
 		this.domElement.className = className;
 	},
@@ -180,7 +180,7 @@ Class ("paella.VideoElementBase", paella.DomNode,{
 		if (animate) {
 			this.disableClassName();
 			var thisClass = this;
-			
+
 			$(this.domElement).animate(style,400,function(){
 				thisClass.enableClassName();
 				paella.events.trigger(paella.events.setComposition, { video:thisClass });
@@ -192,7 +192,7 @@ Class ("paella.VideoElementBase", paella.DomNode,{
 			paella.events.trigger(paella.events.setComposition, { video:this });
 		}
 	},
-	
+
 	getRect:function() {
 		return this._rect;
 	},
@@ -246,6 +246,12 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	flashId:'',
 	_isReady:false,
 	_duration:0,
+	// #DCE MATT-160, capture retrieved video ratio
+	// Defaults are Paella getDimensions() originals
+	//  getDimensions: var dim = {width:640, height:480};
+	// MATT-377, default container to 16x9 on inclomplete load event
+	resHeight:360,
+	resWidth:640,
 
 	initialize:function(id,left,top,width,height) {
 		var This = this;
@@ -263,11 +269,8 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	isReady:function() {
 		return this._isReady;
 	},
-	
+
 	eventReceived:function(eventName,params) {
-//		if (eventName=="progress") {
-//		}
-		
 		params = params.split(",");
 		var processedParams = {};
 		for (var i=0; i<params.length; ++i) {
@@ -290,7 +293,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 		}
 		this.processEvent(eventName,processedParams);
 	},
-	
+
 	processEvent:function(eventName,params) {
 		if (eventName!="loadedmetadata" && eventName!="pause" && params.duration!=0 && !this._isReady) {
 			this._isReady = true;
@@ -446,7 +449,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 		this._defaultVolume = vol;
 		this._volume = vol;
 	},
-	
+
 	setVolume:function(volume) {
 		if (this.flashVideo) {
 			this._volume = volume;
@@ -478,7 +481,8 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 				volume = this.flashVideo.getVolume();
 			}
 			catch (e) {
-				
+				// #DCE log
+				console.log("Unable to set volume on " + this.flashVideo);
 			}
 		}
 		return volume;
@@ -607,6 +611,13 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	},
 
 	addSource:function(sourceData) {
+		// #DCE MATT-160, preserve source height & width params
+		var thisClass = this;
+		if (sourceData && sourceData.res && sourceData.res.w){
+			thisClass.resWidth = sourceData.res.w;
+			thisClass.resHeight = sourceData.res.h; //leap of faith
+		}
+		// end #DCE
 		if (this.streamingMode) {
 			this.addSourceStreaming(sourceData);
 		}
@@ -614,7 +625,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 			this.addSourceProgresiveDownload(sourceData);
 		}
 	},
-	
+
 	unload:function() {
 		if (this.flashVideo) {
 			this.domElement.innerHTML = "";
@@ -623,9 +634,12 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 		}
 		this.parent();
 	},
-	
+
 	getDimensions:function() {
-		var dim = {width:640, height:480};
+		// #DCE MATT-160, use retrieved sourceData.res.w for default
+		// orig: getDimensions: var dim = {width:640, height:480};
+		var thisClass = this;
+		var dim = {width:thisClass.resWidth, height:thisClass.resHeight};
 		if (this._metadata && this._metadata.res) {
 			dim.width = this._metadata.res.w;
 			dim.height = this._metadata.res.h;
@@ -765,7 +779,7 @@ Class ("paella.Html5Video", paella.VideoElementBase,{
 		source.type = sourceData.type;
 		this.domElement.appendChild(source);
 	},
-	
+
 	unload:function() {
 		this.ready = false;
 		var sources = $(this.domElement).find('source');
@@ -914,7 +928,7 @@ Class ("paella.SlideshowVideo", paella.VideoElementBase,{
 
 	setDefaultVolume:function(vol) {
 	},
-	
+
 	volume:function() {
 		return -1;
 	},
@@ -935,7 +949,7 @@ Class ("paella.SlideshowVideo", paella.VideoElementBase,{
 		};
 		frameZero.src = this._frames[0].image;
 	},
-	
+
 	unload:function() {
 		this.domElement.innerHTML = "";
 		this.parent();
