@@ -1,21 +1,23 @@
 {
+    "dceMaxWidth":true,
 	"player":{
 		"defaultProfile": "full",
-        "profileFrameStrategy":"paella.ProfileFrameStrategy",
+        "profileFrameStrategy": "paella.LimitedSizeProfileFrameStrategy",
 		"methods":[{"name":"streaming","enabled":true},
 				   {"name":"html","enabled":true},
-				   {"name":"flash","enabled":true},
-                   {"name":"image","enabled":true}],
+				   {"name":"image","enabled":true},
+				   {"name":"flash","enabled":true}],
+
 		"stream0Audio":true,
 		"stream1Audio":false,
-        "rtmpSettings":{
-            "bufferTime":5
-        }
+                "rtmpSettings":{
+                    "bufferTime":5
+                }
 	},
 	"editor":{
-			"enabled":true
+			"enabled":false
 	},
-	"defaultProfile":"slide_professor",
+        "defaultProfile":"slide_professor",
 	"data":{
 		"enabled":true,
 		"dataDelegates":{
@@ -30,9 +32,9 @@
 		"list":{
 			"ch.ethz.paella.multipleQualitiesPlugin": {"enabled": false},
 			"es.upv.paella.ImageControlPlugin":{"enabled":false},
-			"es.upv.paella.ShowEditorPlugin":{"enabled":true,"alwaysVisible":true},
-			"es.upv.paella.TrimmingPlayerPlugin":{"enabled":true},
-			"es.upv.paella.editor.TrimmingTrackPlugin":{"enabled":true},
+			"es.upv.paella.ShowEditorPlugin":{"enabled":false,"alwaysVisible":false},
+			"es.upv.paella.TrimmingPlayerPlugin":{"enabled":false},
+			"es.upv.paella.editor.TrimmingTrackPlugin":{"enabled":false},
 			"es.upv.paella.playPauseButtonPlugin":{"enabled":true},
             "es.upv.paella.test.videoLoadPlugin":{"enabled":false},
 			"es.upv.paella.test.playbackRate":{"enabled":false},
@@ -53,6 +55,12 @@
 	},
     "standalone" : {
         "reposiroty": "../repository/"
+ 	},
+    "skin": {
+        "default": "dark",
+        "available": [
+            "dark",
+            "light"
+        ]
     }
 }
-

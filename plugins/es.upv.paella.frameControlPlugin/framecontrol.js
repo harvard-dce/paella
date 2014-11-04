@@ -28,6 +28,15 @@ Class ("paella.plugins.FrameControlPlugin",paella.ButtonPlugin,{
 		var jumpAtItem;
     	Keys = {Tab:9,Return:13,Esc:27,End:35,Home:36,Left:37,Up:38,Right:39,Down:40};
 
+		// TODO: verify if this is still required to close existing popups (DCE customization)
+		// #DCE, close the frame control timeline popup if any other popup button is pressed
+		paella.events.bind(paella.events.beforeShowPopUp, function (event, params) {
+			if (params.identifier != thisClass.getName()) {
+				paella.events.trigger(paella.events.hidePopUp, { identifier: thisClass.getName() });
+			}
+		});
+		// #DCE end
+
         $(this.button).keyup(function(event) {
         	var visibleItems = Math.floor(thisClass.contx.offsetWidth/100);
         	var rest = thisClass.buttons.length%visibleItems;
