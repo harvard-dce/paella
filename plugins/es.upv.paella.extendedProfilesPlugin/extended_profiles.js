@@ -101,7 +101,7 @@ Class ("paella.plugins.ExtendedProfilesPlugin",paella.ButtonPlugin,{
 	},
 
 	switchFullScreen:function(profile,profileData){
-		var self = this;		
+		var self = this;
 		if (paella.player.isFullScreen()) {
 			paella.player.exitFullScreen();
 		}

@@ -9,7 +9,7 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 	// Video data:
 	videoData:null,
 
-	getPlayerMode: function() {	
+	getPlayerMode: function() {
 		if (paella.player.isFullScreen()) {
 			return paella.PaellaPlayer.mode.fullscreen;
 		}
@@ -17,12 +17,16 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 			return paella.PaellaPlayer.mode.embed;
 		}
 		else if (paella.extended) {
-			return paella.PaellaPlayer.mode.extended;			
+			return paella.PaellaPlayer.mode.extended;
 		}
 
 		return paella.PaellaPlayer.mode.standard;
 	},
 
+	// #DCE flag for preview load/resize
+	isPreview:true,
+	// #DCE MATT-473 fallback view profile
+	defaultProfile:null,
 
 	checkFullScreenCapability: function() {
 		var fs = document.getElementById(paella.player.mainContainer.id);
@@ -127,6 +131,13 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 		var thisClass = this;
 		this.videoContainer.setProfile(profileName,function(newProfileName) {
 			thisClass.selectedProfile = newProfileName;
+			/** OBE? TODO: delete if not needed 
+			// #DCE ensure that the previews are [re]loaded after profile retrieved
+			if (thisClass.isPreview){
+			    thisClass.unloadPreviews();
+			    thisClass.isPreview = true;
+			    thisClass.loadPreviews(profileName);
+			} // #DCE end */
 		},animate);
 	},
 
@@ -265,8 +276,14 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 	//	}
 	//},
 
+	// #DCE protection from un-configured editor
 	showEditor:function() {
-		new paella.editor.Editor();
+        if (paella.editor) {
+            new paella.editor.Editor();
+		} else {
+		    //TODO: add translation to message
+		    paella.messageBox.showError("WARNING: Editor requested by configuration, but editor plugin code is not included in this build.");
+		}
 	},
 
 	hideEditor:function() {
@@ -393,10 +410,14 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 			paella.player.videoContainer.overlayContainer.removeElement(this.slavePreviewElem);
 			this.slavePreviewElem = null;
 		}
+		// #DCE reload profile strategy (TODO: remove if no longer needed in 4.0)
+		this.isPreview = false;
 	},
 
 	loadComplete:function(event,params) {
 		var thisClass = this;
+		// #DCE MATT-473 preserve the config default as a fallback profile
+		this.defaultProfile = this.config.defaultProfile;
 
 		var master = paella.player.videoContainer.masterVideo();
 		var getProfile = base.parameters.get('profile');

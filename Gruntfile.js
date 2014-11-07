@@ -231,7 +231,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('checksyntax', ['concat:less','less:production','jshint', 'csslint', 'jsonlint']);
 
 	grunt.registerTask('build.common', ['revision', 'checksyntax', 'copy:paella', 'concat:dist.js', 'clean:less', 'merge-json:i18n']);
-	grunt.registerTask('build.release', ['build.common', 'uglify:dist', 'cssmin:dist']);
+	grunt.registerTask('build.release', ['build.common', 'cssmin:dist']);
+	// #DCE orig has compact grunt.registerTask('build.release', ['build.common', 'uglify:dist', 'cssmin:dist']);
 	grunt.registerTask('build.debug', ['build.common']);
 
 	grunt.registerTask('server.release', ['build.release', 'express', 'watch:release']);
