@@ -10,9 +10,9 @@
 
 		"stream0Audio":true,
 		"stream1Audio":false,
-        "rtmpSettings":{
-            "bufferTime":5
-        }
+                "rtmpSettings":{
+                    "bufferTime":5
+                }
 	},
 	"editor":{
 			"enabled":false

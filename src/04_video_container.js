@@ -605,7 +605,6 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 
 		/*
 		this.play();
-
 		var This = this;
 		setTimeout(function() {
 			if (paused) This.pause();
@@ -1153,8 +1152,8 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 
     dceRefreshContainerProfile: function(isMaxSize){
         this.isMaxSize = isMaxSize;
-        var getProfile = paella.utils.parameters.get('profile');
-        var cookieProfile = paella.utils.cookies.get('lastProfile');
+        var getProfile = base.cookies.get('profile');
+        var cookieProfile = base.cookies.get('lastProfile');
         if (getProfile) {
             this.setProfile(getProfile);
         }

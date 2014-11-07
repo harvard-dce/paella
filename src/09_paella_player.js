@@ -167,8 +167,10 @@ Class ("paella.PaellaPlayer", paella.PlayerBase,{
 				message = base.dictionary.translate(message);
 				message = message.replace("version",base.userAgent.browser.Version.major);
 				message = message.replace("min_version",minFirefoxVersion);
-				paella.messageBox.showError(message);
-				return false;
+				// #DCE debugging FF & RTMP
+				console.log(message);
+				// paella.messageBox.showError(message);
+				// return false;
 			}
 			paella.initDelegate.loadConfig(function(config) {
 				var skin = (config.skin && config.skin.default) ? config.skin.default:'dark';

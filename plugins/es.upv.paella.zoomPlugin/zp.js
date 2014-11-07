@@ -449,7 +449,8 @@ Class ("paella.ZoomPlugin", paella.EventDrivenPlugin,{
 	},
 
 	getName:function() { 
-		return "es.upv.paella.ZoomPlugin";
+	   // #DCE small Z to match the assigned var & plugin directory name
+		return "es.upv.paella.zoomPlugin";
 	}
 });
 

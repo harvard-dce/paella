@@ -17,7 +17,6 @@ Class ("paella.plugins.UserTrackingCollectorPlugIn",paella.EventDrivenPlugin,{
 		}
 		//--------------------------------------------------
 		// #DCE MATT-462 GL
-		var thisClass = this;
 		$(window).resize(function(event) { thisClass.onResize(thisClass); });
 	},
 	

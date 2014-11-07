@@ -2,7 +2,10 @@
 paella.Profiles = {
 	loadProfile:function(profileName,onSuccessFunction) {
 		// #DCE MATT-473 get defaultProfile for fallback
-		var defaultProfile = paella.player.defaultProfile;
+ 		var defaultProfile = "professor_slide";
+ 		if (paella.player && paella.player.config && paella.player.config.defaultProfile) {
+ 				defaultProfile = paella.player.config.defaultProfile;
+ 		}
 		var params = { url:"config/profiles/profiles.json" };
 
 		base.ajax.get(params,function(data,mimetype,code) {
@@ -17,7 +20,7 @@ paella.Profiles = {
 				} else {
 				    // default fallback, save fallback as lastProfile
 				    profileData = data[defaultProfile];
-				    paella.utils.cookies.set("lastProfile",defaultProfile);
+				    base.cookies.set("lastProfile",defaultProfile);
 				}
 				onSuccessFunction(profileData);
 				// #DCE end
@@ -610,7 +613,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 		}
 		this.parent();
 	},
-	
+
 	getDimensions:function() {
 		// #DCE MATT-160, use retrieved sourceData.res.w for default
 		// orig: getDimensions: var dim = {width:640, height:480};

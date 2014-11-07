@@ -2,6 +2,8 @@
     "slide_professor": {
         "name": {"es": "Presentación y presentador"},
         "icon": "slide_professor_icon.png",
+        "dceWidthType": "double",
+        "dceBufferSize": 12,
         "masterVideo": {
             "content": "presenter",
             "rect": [
@@ -70,7 +72,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
@@ -147,7 +149,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
@@ -190,17 +192,8 @@
                 "aspectRatio": "4/3",
                 "left": "0",
                 "top": "0",
-                "width": "0",
-                "height": "0",
-                "comment": "#DCE, Collapse the slave video on presenter only view"
-            },
-            {
-                "aspectRatio": "16/9",
-                "left": "0",
-                "top": "0",
-                "width": "0",
-                "height": "0",
-                "comment": "#DCE, Collapse the slave video on presenter only view"
+                "width": "300",
+                "height": "300"
             }],
             "visible": "false",
             "layer": "1"
@@ -217,7 +210,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
@@ -236,20 +229,11 @@
         "masterVideo": {
             "content": "presenter",
             "rect": [{
-                "aspectRatio": "4/3",
-                "left": "0",
-                "top": "0",
-                "width": "0",
-                "height": "0",
-                "comment" :"#DCE, Collapse presenter video on slide only view"
-            },
-            {
                 "aspectRatio": "16/9",
                 "left": "0",
                 "top": "0",
-                "width": "0",
-                "height": "0",
-                "comment" :"#DCE, Collapse presenter video on slide only view"
+                "width": "320",
+                "height": "190"
             }],
             "visible": "false",
             "layer": "1"
@@ -287,7 +271,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
@@ -357,7 +341,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
@@ -427,7 +411,7 @@
             "visible": "true",
             "layer": "0"
         },
-        "logos": [{
+        "logos-#DCE-ignore": [{
             "content": "paella_logo.png",
             "zIndex": 5,
             "rect": {
