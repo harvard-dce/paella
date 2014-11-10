@@ -134,7 +134,7 @@ module.exports = function(grunt) {
 				 	'src/*.js',
 				 	'plugins/**',
 					'vendor/plugins/**',
-					'resources/style/*.less',
+					'resources/style/**',
 					'src/flash_player/player.swf'
 				 ],
 				 tasks: ['build.debug']

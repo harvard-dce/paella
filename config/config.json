@@ -2,7 +2,7 @@
     "dceMaxWidth":true,
 	"player":{
 		"defaultProfile": "full",
-        "profileFrameStrategy": "paella.LimitedSizeProfileFrameStrategy",
+        "profileFrameStrategy": "paella.ProfileFrameStrategy",
 		"methods":[{"name":"streaming","enabled":true},
 				   {"name":"html","enabled":true},
 				   {"name":"image","enabled":true},
@@ -17,7 +17,7 @@
 	"editor":{
 			"enabled":false
 	},
-        "defaultProfile":"slide_professor",
+        "defaultProfile":"professor_slide",
 	"data":{
 		"enabled":true,
 		"dataDelegates":{
@@ -43,22 +43,21 @@
 			"edu.harvard.dce.paella.flexSkipPlugin": {"enabled":true, "direction": "Rewind", "seconds": 10},
 			"edu.harvard.dce.paella.flexSkipPluginForward": {"enabled":true, "direction": "Forward", "seconds": 30},
 			"es.upv.paella.footprintsPlugin": {"enabled":false},
-			"es.upv.paella.playbackRate": {"enabled":false},
+			"es.upv.paella.playbackRate": {"enabled":true},
             "es.upv.paella.helpPlugin": {"enabled":true, "langs":["en","es"]},
             "es.upv.paella.ZoomPlugin": {"enabled": true, "maxZoom":500, "minZoom":100, "zoomIncr":10},
             "es.upv.paella.fullScreenButtonPlugin": {"enabled":true, "reloadOnFullscreen":{ "enabled":true, "keepUserSelection":true }},
-            "es.upv.paella.extendedProfilesPlugin": {"enabled":true, "reloadOnFullscreen":"reload" },
-            "es.upv.paella.themeChooserPlugin":  {"enabled":true}
+            "es.upv.paella.extendedProfilesPlugin": {"enabled":false, "reloadOnFullscreen":"reload" },
+            "es.upv.paella.themeChooserPlugin":  {"enabled":false},
+            "es.upv.paella.viewModePlugin": { "enabled":false},
+            "edu.harvard.dce.paella.viewModeTogglePlugin": {"enabled":true},
+            "es.upv.paella.socialPlugin": { "enabled":false}
 		}
 	},
     "standalone" : {
         "reposiroty": "../repository/"
  	},
     "skin": {
-        "default": "dark",
-        "available": [
-            "dark",
-            "light"
-        ]
+        "default": "cs50"
     }
 }
