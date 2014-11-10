@@ -1,0 +1,200 @@
+{
+    "mediapackage": {
+        "media": {
+            "tracks": [
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1920x1080",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1920x1080",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter-1280x720.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1280x720",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation-1280x720.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1280x720",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter-800x450.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "800x450",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation-800x450.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "800x450",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                },
+                {
+                    "mimetype": "video-640x360.mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter-640x360.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "640x360",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presenter.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video-640x360.mp4",
+                    "tags": [],
+                    "url": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation-640x360.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 30,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "640x360",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "https://s3.amazonaws.com/vid-streaming-test/ecm-presentation.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                }
+            ]
+        },
+        "metadata": {
+            "duration": "909130",
+            "start": "2013-06-21T06:39:00Z",
+            "creators": [],
+            "license": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+            "title": "Belmar 15 minutes"
+        }
+    },
+    "version": "1.0.0"
+}

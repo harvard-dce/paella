@@ -1,0 +1,107 @@
+/* Light icons over dark background */
+@fontFamily: Verdana, sans-serif;
+
+@linkColor: #636363;
+
+@linkHoverColor: #a4a4a4;
+
+@linkActiveColor: #3d3d3d;
+
+@mainColor: #e4e4e4;
+
+@hoverBackgroundColor: #555;
+
+@backgroundColor: #222;
+
+@shadowColor: #e4e4e4;
+
+@paella_icons_image: url(../images/paella_icons_cs50.png);
+
+@paella_icons_bkg_size: 2000% 1000%;
+
+@backgroundImage: none;
+
+@backgroundImageSize: auto;
+
+@icon_text_color: rgb(21, 21, 21);
+
+@popup_text_color: white;
+
+@playbackBarButtonHeightPx: 30;
+
+@playbackBarButtonWidthPx: 30;
+
+@playbackControlHeightPx: 12;
+
+@playbackBarFontSize: 12px;
+
+.buttonPlugin {
+  margin-right: 5px;
+
+  .selected, &.selected {
+    background-color: #555;
+  }
+}
+
+.buttonPluginPopUp{
+  background-color: #333;
+  border: 1px solid #555;
+}
+
+.playbackBar {
+  border: 1px solid #555;
+}
+
+#playerContainer_videoContainer {
+  background-color: #222;
+  background-image: linear-gradient(to bottom, #333, #111);
+}
+
+img#playerContainer_videoContainer_bkg{
+  display: none;
+}
+
+.timeControl {
+  color: #555;
+}
+
+div#playerContainer_controls_playback_playbackBar{
+  background-image: linear-gradient(to bottom, #1f1f1f, #313131);
+  top: 17px;
+  border-radius: 5px;
+  right: 180px;
+  left: 200px;
+}
+
+div#playerContainer_controls_playback_playbackBar_full{
+  background-image: linear-gradient(to bottom, #fafafa, #666);
+  border-radius: 5px;
+}
+
+.playbackBarPlugins {
+  padding: 5px;
+  border-top: 1px #555 solid;
+  background: -ms-linear-gradient(top, #333 0%,#333 50%, #2b2b2b 50%, #2b2b2b 100%); /* W3C */
+  background: linear-gradient(to bottom, #333 0%,#333 50%, #2b2b2b 50%, #2b2b2b 100%); /* W3C */
+}
+
+.showPlaybackRateButton, .showMultipleQualitiesPlugin {
+  color: white;
+  background-image: none;
+
+  .playbackRateItem{
+    padding: 0em .25em 0em;
+    font-size: 1em;
+  }
+}
+
+.buttonTimeLine.frameControl{
+  border-top: 1px solid #555;
+  background-color: #333;
+}
+
+.frameControlContent {
+  .frameControlItem:hover{
+    opacity: 0.5;
+  }
+}
