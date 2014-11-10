@@ -2,25 +2,28 @@
 paella.Profiles = {
 	loadProfile:function(profileName,onSuccessFunction) {
 		// #DCE MATT-473 get defaultProfile for fallback
- 		var defaultProfile = "professor_slide";
- 		if (paella.player && paella.player.config && paella.player.config.defaultProfile) {
- 				defaultProfile = paella.player.config.defaultProfile;
- 		}
+		var defaultProfile;
+		if (paella.player && paella.player.config && paella.player.config.defaultProfile) {
+				defaultProfile = paella.player.config.defaultProfile;
+		}
 		var params = { url:"config/profiles/profiles.json" };
 
 		base.ajax.get(params,function(data,mimetype,code) {
 				if (typeof(data)=="string") {
 					data = JSON.parse(data);
 				}
-				// #DCE MATT-473 use default profile when attempted profile has no option mapping
 				var profileData;
 				if(data[profileName] ){
-				    // successful mapping
+				    // Successful mapping
 				    profileData = data[profileName];
-				} else {
-				    // default fallback, save fallback as lastProfile
+				} else if (data[defaultProfile]) {
+				    // Fallback to default profile
 				    profileData = data[defaultProfile];
 				    base.cookies.set("lastProfile",defaultProfile);
+				} else {
+				    // Unable to find or map defaultProfile in profiles.json
+				    base.log.debug("Error loading the default profile. Check your Paella Player configuration");
+				    return false;
 				}
 				onSuccessFunction(profileData);
 				// #DCE end
