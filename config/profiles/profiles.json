@@ -147,5 +147,5 @@
 			{"aspectRatio":"4/3","left":"160","top":"0","width":"960","height":"720"}],"visible":"true","layer":"1"},
 		"background":{"content":"default_background_paella.jpg","zIndex":5,"rect":{"left":"0","top":"0","width":"1280","height":"720"},"visible":"true","layer":"0"},
 		"logos":[{"content":"paella_logo.png","zIndex":5,"rect":{"top":"10","left":"10","width":"49","height":"42"}}]
-	}	
+	}
 }

@@ -1,0 +1,108 @@
+{
+    "mediapackage": {
+        "media": {
+            "tracks": [
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "http://d2o9nyf4hwsci4.cloudfront.net/2014/fall/lectures/0/w/week0w-a-360p.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 25,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1280x720",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "http://localhost:8001/presenter_player_preview.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video/webm",
+                    "tags": [],
+                    "url": "http://d2o9nyf4hwsci4.cloudfront.net/2014/fall/lectures/0/w/week0w-a-360p.webm",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 25,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1280x720",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "http://localhost:8001/presenter_player_preview.jpg",
+                    "type": "presenter/delivery",
+                    "id": "22b89582-5baf-449c-a92e-71ef5fb437a4"
+                },
+                {
+                    "mimetype": "video/mp4",
+                    "tags": [],
+                    "url": "http://d2o9nyf4hwsci4.cloudfront.net/2014/fall/lectures/0/w/week0w-b-360p.mp4",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 25,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1024x768",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "http://localhost:8001/presentation_player_preview.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                },
+                {
+                    "mimetype": "video/webm",
+                    "tags": [],
+                    "url": "http://d2o9nyf4hwsci4.cloudfront.net/2014/fall/lectures/0/w/week0w-b-360p.webm",
+                    "mediainfo": {
+                        "video": {
+                            "scantype": {
+                                "type": "Progressive"
+                            },
+                            "bitrate": 200000,
+                            "framerate": 25,
+                            "encoder": {
+                                "type": "AVC"
+                            },
+                            "device": "",
+                            "resolution": "1024x768",
+                            "id": "video-1"
+                        }
+                    },
+                    "preview": "http://localhost:8001/presentation_player_preview.jpg",
+                    "type": "presentation/delivery",
+                    "id": "500f6b74-1557-4c87-8613-0ce5194b84ba"
+                }
+            ]
+        },
+        "metadata": {
+            "duration": "909130",
+            "start": "2013-06-21T06:39:00Z",
+            "creators": [],
+            "license": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+            "title": "Belmar 15 minutes"
+        }
+    },
+    "version": "1.0.0"
+}

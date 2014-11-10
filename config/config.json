@@ -20,7 +20,7 @@
 	"editor":{
 		"enabled":false
 	},
-        "defaultProfile":"slide_professor",
+        "defaultProfile":"professor_slide",
 	"data":{
 		"enabled":true,
 		"dataDelegates":{
@@ -43,7 +43,7 @@
 			"es.upv.paella.editor.TrimmingTrackPlugin":{"enabled":false},
 			"es.upv.paella.playPauseButtonPlugin":{"enabled":true},
 			"es.upv.paella.test.videoLoadPlugin":{"enabled":false},
-			"es.upv.paella.test.playbackRate":{"enabled":false},
+			"es.upv.paella.test.playbackRate":{"enabled":true},
 			"es.upv.paella.volumeRangePlugin":{"enabled":true, "showMasterVolume": true, "showSlaveVolume": false },
 			"es.upv.paella.userTrackingCollectorPlugIn": {"enabled": true, "heartBeatTime": 5000},
 			"es.upv.paella.repeatButtonPlugin": {"enabled":false},
@@ -59,9 +59,9 @@
 			"es.upv.paella.playbackRatePlugin": {"enabled":true, "availableRates": [0.75, 1, 1.25, 1.5]},			
 			"es.upv.paella.playPauseButtonPlugin": {"enabled":true},
 			"es.upv.paella.searchPlugin": {"enabled":true, "sortType":"time", "colorSearch":false},
-			"es.upv.paella.socialPlugin": {"enabled":true},
-			"es.upv.paella.themeChooserPlugin":  {"enabled":true},
-			"es.upv.paella.viewModePlugin": { "enabled": true },
+			"es.upv.paella.socialPlugin": {"enabled":false},
+			"es.upv.paella.themeChooserPlugin":  {"enabled":false},
+			"es.upv.paella.viewModePlugin": { "enabled": false },
 			"es.upv.paella.volumeRangePlugin":{"enabled":true, "showMasterVolume": true, "showSlaveVolume": false },
 			
 			"//****": "Video Overlay Button Plugins",
@@ -81,7 +81,8 @@
 			"es.upv.paella.test.videoLoadPlugin": {"enabled":false},
 			"es.upv.paella.translecture.captionsPlugin": {"enabled":true},
 			"es.upv.paella.trimmingPlayerPlugin": {"enabled":true},
-			"es.upv.paella.zoomPlugin": {"enabled": false},
+			"es.upv.paella.ZoomPlugin": {"enabled": true, "maxZoom":500, "minZoom":100, "zoomIncr":10},
+
 									
 			"//****": "Captions Parser Plugins",
 			"es.upv.paella.captions.DFXPParserPlugin": {"enabled":true},
@@ -98,17 +99,16 @@
 			"es.upv.paella.editor.toolStatusPlugin": {"enabled":true},
 			"es.upv.paella.editor.trackAnnotationsPlugin": {"enabled":true},
 			"es.upv.paella.editor.trackBreaksPlugin": {"enabled":true},
-			"es.upv.paella.editor.trimmingTrackPlugin": {"enabled":true}
+			"es.upv.paella.editor.trimmingTrackPlugin": {"enabled":true},
+
+            "//****": "DCE plugin",
+            "edu.harvard.dce.paella.viewModeTogglePlugin": {"enabled":true},
 		}
 	},
     "standalone" : {
         "reposiroty": "../repository/"
  	},
     "skin": {
-        "default": "dark",
-        "available": [
-            "dark",
-            "light"
-        ]
+        "default": "cs50"
     }
 }
