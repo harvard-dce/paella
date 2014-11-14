@@ -65,7 +65,8 @@ Class ("paella.VideoOverlay", paella.DomNode,{
 				this.domElement.removeChild(element);
 			}
 			catch (e) {
-				
+				//#DCE leave a note
+				console.log("unable to remove element" + element);
 			}
 		}
 	},
@@ -298,9 +299,13 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	_firstLoad:false,
 	_playOnLoad:false,
 	_seekToOnLoad:0,
-	
+
 	_defaultMasterVolume:1,
 	_defaultSlaveVolume:1,
+
+	// #DCE, MATT-381 give max size of container
+	// TODO: verify if this now handled by "paella.ProfileFrameStrategy"
+	isMaxSize: true,
 
 	initialize:function(id) {
 		this.parent(id);
@@ -328,14 +333,20 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		this.container.addNode(new paella.BackgroundContainer(this.backgroundId,'config/profiles/resources/default_background_paella.jpg'));
 
 		paella.events.bind(paella.events.timeupdate,function(event) { thisClass.checkVideoTrimming(); } );
-		
+
 		paella.events.bind(paella.events.singleVideoReady, function(evt,params) {
 			thisClass.onVideoLoaded(params.sender);
 		});
-		
+
 		paella.events.bind(paella.events.singleVideoUnloaded, function(evt,params) {
 			thisClass.onVideoUnloaded(params.sender);
 		});
+
+		// #DCE MATT-381, reset profile restrictions after full screen
+		// true = set max size on video, false = no size limit
+		// TODO: verify if this is now handled by "paella.ProfileFrameStrategy"
+		//paella.events.bind(paella.events.exitFullscreen,function(event){thisClass.dceRefreshContainerProfile(true);});
+		//paella.events.bind(paella.events.enterFullscreen,function(event){thisClass.dceRefreshContainerProfile(false);});
 
 		var timer = new base.Timer(function(timer) {
 			thisClass.syncVideos();
@@ -463,7 +474,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	},
 
 	setCurrentTime:function(time) {
-		if (time<=0) time = 1; 
+		if (time<=0) time = 1;
 		if (this.trimming.enabled) {
 			if (time<this.trimming.start) time = this.trimming.start;
 			if (time>this.trimming.end) time = this.trimming.end;
@@ -527,11 +538,11 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			return 0;
 		}
 	},
-	
+
 	setDefaultMasterVolume:function(vol) {
 		this._defaultMasterVolume = vol;
 	},
-	
+
 	setDefaultSlaveVolume:function(vol) {
 		this._defaultSlaveVolume = vol;
 	},
@@ -585,7 +596,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	setMasterQuality:function(quality) {
 		this._masterQuality = quality;
 	},
-	
+
 	setSlaveQuality:function(quality) {
 		this._slaveQuality = quality;
 	},
@@ -600,7 +611,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		var slaveVideo = this.slaveVideo();
 		if (masterVideo) masterVideo.unload();
 		if (slaveVideo) slaveVideo.unload();
-		 
+
 		this.setMasterQuality(masterQuality);
 		this.setSlaveQuality(slaveQuality);
 		this._seekToOnLoad = this.currentTime();
@@ -617,7 +628,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	setSources:function(master,slave) {
 		var masterRect = {x:850,y:140,w:360,h:550};
 		var slaveRect = {x:10,y:40,w:800,h:600};
-		
+
 		this._unloadVideos();
 
 		if (!master || !master.data || !master.type || !master.type.name) {
@@ -636,7 +647,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			this.setMonoStreamMode(true);
 		}
 	},
-	
+
 	onVideoLoaded:function(sender) {
 		var This = this;
 		if ((this.isMonostream && this.masterVideo() && this.masterVideo().isReady()) ||
@@ -653,7 +664,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			}
 		}
 	},
-	
+
 	onVideoUnloaded:function(sender) {
 		if (this.isMonostream) {
 			paella.events.trigger(paella.events.videoUnloaded);
@@ -663,7 +674,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			paella.events.trigger(paella.events.videoUnloaded);
 		}
 	},
-	
+
 	_unloadVideos:function() {
 		var master = this.masterVideo();
 		var slave = this.slaveVideo();
@@ -711,7 +722,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		this.container.addNode(videoNode);
 		this.sourceData.push(data);
 		this.setupVideo(videoNode,data,type.name,target);
-		
+
 		return true;
 	},
 
@@ -820,7 +831,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			layer:1,
 			rect:[
 				{aspectRatio:"16/9",left:0,top:0,width:1280,height:720},
-				{aspectRatio:"4/3",left:160,top:0,width:960,height:720},
+				{aspectRatio:"4/3",left:160,top:0,width:960,height:720}
 			]
 		};
 	},
@@ -832,7 +843,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			layer:0,
 			rect:[
 				{aspectRatio:"16/9",left:0,top:0,width:0,height:0},
-				{aspectRatio:"4/3",left:0,top:0,width:0,height:0},
+				{aspectRatio:"4/3",left:0,top:0,width:0,height:0}
 			]
 		};
 	},
@@ -846,7 +857,9 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 				profileData.slaveVideo = thisClass.getMonostreamSlaveProfile();
 			}
 			thisClass.applyProfileWithJson(profileData,Animate);
-			onSuccess(profileName);
+			if (onSuccess) {
+				onSuccess(profileName);
+			}
 			base.cookies.set("lastProfile",profileName);
 		});
 	},
@@ -891,6 +904,13 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 
 	applyProfileWithJson:function(profileData,animate) {
 		if (animate==undefined) animate = true;
+		// #DCE MATT-377 issue with video1 and video2 not ready
+		// ratio to use on incomplete load
+		// TODO: This replaces same code defaults in Paella 3.1.x as in 2.x ...and 4.0
+		var dceFallbackRatioMaster = 1.7777;  // default to 16x9
+		var dceFallbackRatioSlave = 1.3333;  // default to 4x3
+		var dceFallbackSlaveDimensions = {width:480,height:360};  // default small
+		// #DCE see substitutions below
 		var video1 = this.container.getNode(this.video1Id);
 		var video2 = this.container.getNode(this.video2Id);
 		if (!video1) return;	// The video is not loaded
@@ -900,12 +920,13 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		var rectMaster = profileData.masterVideo.rect[0];
 		var rectSlave = profileData.slaveVideo.rect[0];
 		var masterDimensions = video1.getDimensions();
-		var slaveDimensions = {width:360,height:240};
+		var slaveDimensions = dceFallbackSlaveDimensions;
 		if (video2) slaveDimensions = video2.getDimensions();
-		var masterAspectRatio = (masterDimensions.height==0) ? 1.3333:masterDimensions.width / masterDimensions.height;
-		var slaveAspectRatio = (slaveDimensions.height==0) ? 1.3333:slaveDimensions.width / slaveDimensions.height;
-		var profileMasterAspectRatio = 1.333;
-		var profileSlaveAspectRatio = 1.333;
+		var masterAspectRatio = (masterDimensions.height==0) ? dceFallbackRatioMaster:masterDimensions.width / masterDimensions.height;
+		var slaveAspectRatio = (slaveDimensions.height==0) ? dceFallbackRatioSlave:slaveDimensions.width / slaveDimensions.height;
+		var profileMasterAspectRatio = dceFallbackRatioMaster;
+		var profileSlaveAspectRatio = dceFallbackRatioSlave;
+		// #DCE end 
 
 		var minMasterDiff = 10;
 		for (var i = 0; i<profileData.masterVideo.rect.length;++i) {
@@ -933,6 +954,72 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 				rectSlave = profileSlave;
 			}
 		}
+
+/** TODO, try to replace this with the 4.0.0. max size strategy
+        // #DCE MATT-381, max size
+        //    "dceWidthType": "double"| "single"
+        //    "dceBufferSize": 12, the size of buffer between two videos
+        // using verbose variable names to make the intent clear
+        if(paella.player.config && (paella.player.config.dceMaxWidth == true) && this.isMaxSize){
+            // TODO: migrate this into event listenting plugin
+            var masterRelativeWidth = 0;
+            var masterResolutionWidth = 0;
+            var slaveRelativeWidth = 0;
+            var slaveResolutionWidth = 0;
+            var masterRelativeHeight = 0;
+            var masterResolutionHeight = 0;
+            var slaveRelativeHeight = 0;
+            var slaveResolutionHeight = 0;
+            if (rectMaster && masterDimensions){
+                masterRelativeWidth = rectMaster.width;
+                masterResolutionWidth = masterDimensions.width;
+                masterRelativeHeight = rectMaster.height;
+                masterResolutionHeight = masterDimensions.height;
+            }
+            if(rectSlave && slaveDimensions){
+                slaveRelativeWidth = rectSlave.width;
+                slaveResolutionWidth = slaveDimensions.width;
+                slaveRelativeHeight = rectSlave.height;
+                slaveResolutionHeight = slaveDimensions.height;
+            }
+
+            // #DCE MATT-471, MATT-381
+            var relativeSize = new paella.RelativeVideoSize();
+            var tempMaxWidth = this.dceSetMaxSize(masterRelativeWidth, masterResolutionWidth,
+                    slaveRelativeWidth, slaveResolutionWidth, profileData.dceWidthType,profileData.dceBufferSize);
+
+            // The relative size class is the base porportional measure
+            var tempMaxHeight = relativeSize.proportionalHeight(tempMaxWidth);
+
+            // Default protection for when video sizes are not really ready
+            var minDefaultVideoSize = 100; //100px is smallest size allowed to open
+            tempMaxWidth =  (tempMaxWidth > minDefaultVideoSize)? tempMaxWidth: relativeSize.w;
+            tempMaxHeight =  (tempMaxHeight > minDefaultVideoSize)? tempMaxHeight: relativeSize.h;
+
+            if((tempMaxWidth > 0)  && (tempMaxHeight > 0)) {
+                this.container.domElement.style.maxWidth = tempMaxWidth + "px";
+                this.container.domElement.style.maxHeight = tempMaxHeight + "px";
+            }
+        }
+        // end #DCE MATT-381
+
+
+		// Logos
+		// Hide previous logos
+		this.hideAllLogos();
+
+		// Create or show new logos
+		this.showLogos(profileData.logos);
+
+		video1.setRect(rectMaster,true);
+		this.currentMasterVideoRect = rectMaster;
+		video1.setVisible(profileData.masterVideo.visible,true);
+		if (video2) {
+			video2.setRect(rectSlave,true);
+			this.currentSlaveVideoRect = rectSlave;
+			video2.setVisible(profileData.slaveVideo.visible,true);
+			video2.setLayer(profileData.slaveVideo.layer);
+		} */
 
 		// Logos
 		// Hide previous logos
@@ -1011,5 +1098,75 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		else {
 			this.resizePortrail();
 		}
-	}
+	},
+
+    // TODO: delete the following if the max size profile strategy does similar
+    // #DCE MATT-381, max size to mediapackage resoulution, restrict video container by view
+    // TODO:1 verify if this is handled by "paella.ProfileFrameStrategy"
+    // TODO:2 Migreate this code into a paella plugin
+    //     this.dceSetMaxWidth(masterRelativeWidth, masterResolutionWidth,
+    //          slaveRelativeWidth, slaveResolutionWidth, profileData.dceWidthType,profileData.dceBufferSize);
+    dceSetMaxSize: function(relativeW1, maxW1, relativeW2, maxW2, widthType, bufferSize){
+        // convert to numbers
+        // relative width
+        var relW1Int;
+        var relW2Int;
+        // resolution width
+        var resW1Int;
+        var resW2Int;
+
+        var bufferInt;
+
+        try {
+            relW1Int = parseInt(relativeW1);
+            relW2Int = parseInt(relativeW2);
+            resW1Int = parseInt(maxW1);
+            resW2Int = parseInt(maxW2);
+            bufferInt = parseInt(bufferSize);
+        }  catch (e) {
+            paella.debug.log('paella.VideoContainerBase.dceSetMaxSize(), sizes must be integeters');
+            return false;
+        }
+
+        if(widthType == 'single'){
+            return this.dceSingeMaxSize(relW1Int, resW1Int, relW2Int, resW2Int, bufferInt);
+        } else  if(widthType == 'double'){
+            return this.dceDoubleMaxSize(relW1Int, resW1Int, relW2Int, resW2Int, bufferInt);
+        } else {
+            paella.debug.log("paella.VideoContainerBase.dceSetMaxSize(), unknown width type '" + widthType + "'");
+            return false;
+        }
+    },
+
+    // This filters out which max width to take
+    dceSingeMaxSize: function(relativeW1, maxW1, relativeW2, maxW2, bufferSize){
+        var result = 0;
+        if(relativeW1 > relativeW2){
+            result = maxW1;
+        } else {
+             result = maxW2;
+        }
+        return result;
+    },
+
+    // this is always adding the max of master & slave 
+    dceDoubleMaxSize: function(relativeW1, maxW1, relativeW2, maxW2, bufferSize){
+        return maxW1 + maxW2 + bufferSize;
+    },
+
+    dceRefreshContainerProfile: function(isMaxSize){
+        this.isMaxSize = isMaxSize;
+        var getProfile = base.cookies.get('profile');
+        var cookieProfile = base.cookies.get('lastProfile');
+        if (getProfile) {
+            this.setProfile(getProfile);
+        }
+        else if (cookieProfile) {
+            this.setProfile(cookieProfile);
+        }
+        else {
+            this.setProfile(this.config.defaultProfile);
+        }
+    }
+    // #DCE end
 });
