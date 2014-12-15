@@ -1,5 +1,25 @@
 {
     "mediapackage": {
+        "captions": [
+          {
+            "lang": "en",
+            "text": "English",
+            "format": "webvtt",
+            "url": "/repository/mock_ecm_endpoint/subtitles.vtt"
+          },
+          {
+            "lang": "fo",
+            "text": "Unsupported",
+            "format": "fsdfsd",
+            "url": "/repository/mock_ecm_endpoint/subtitles-es.vtt"
+          },
+          {
+            "lang": "es",
+            "text": "Spanish",
+            "format": "webvtt",
+            "url": "/repository/mock_ecm_endpoint/subtitles-es.vtt"
+          }
+        ],
         "media": {
             "tracks": [
                 {
