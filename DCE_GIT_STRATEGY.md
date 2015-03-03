@@ -20,7 +20,7 @@ If your feature is 100% DCE-specific, then it's OK to create the feature branch
 off `dce-release` proper. This should be used with caution to maximize our
 likelihood of creating code we can open source.
 
-## The process
+## The process when developing a new feature
 
     # Set up our fork and the upstream origin, you only need to do this once
     git clone git@github.com:harvard-dce/paella.git
@@ -78,4 +78,21 @@ likelihood of creating code we can open source.
     # Clean up after yourself by removing the now merged feature branch commits.
     git push origin :your-feature-branch-name
     git branch -d your-feature-branch-name
+
+## The process when updating against upstream/master
+
+    # This assumes you have paella/matterhorn set as an origin named "upstream"
+    git fetch --all
+    git checkout dce-release
+    git checkout -b your-update-branch-name
+    git push -u origin your-update-branch-name
+    git rebase -i upstream/master
+    # Fix merge conflicts
+    # QA happens
+    git push --force #You must force push because you've rewrote history and plopped our commits on upstream/master
+    # Work happens. Push commits to your-update-branch-name
+    git rebase -i dce-release # Squash only our commits
+    git checkout dce-release
+    git merge you-update-branch-name
+    git push --force #You must force push because you've rewrote history and plopped our commits on upstream/master
 
