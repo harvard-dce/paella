@@ -79,7 +79,7 @@ likelihood of creating code we can open source.
     git push origin :your-feature-branch-name
     git branch -d your-feature-branch-name
 
-## The process when updating against upstream/master
+## The process when creating a feature and updating against upstream/master
 
     # This assumes you have paella/matterhorn set as an origin named "upstream"
     git fetch --all
@@ -87,12 +87,18 @@ likelihood of creating code we can open source.
     git checkout -b your-update-branch-name
     git push -u origin your-update-branch-name
     git rebase -i upstream/master
-    # Fix merge conflicts
-    # QA happens
-    git push --force #You must force push because you've rewrote history and plopped our commits on upstream/master
-    # Work happens. Push commits to your-update-branch-name
-    git rebase -i dce-release # Squash only our commits
-    git checkout dce-release
-    git merge you-update-branch-name
-    git push --force #You must force push because you've rewrote history and plopped our commits on upstream/master
+    # Fix merge conflicts and push
 
+    # Make your changes
+    # QA happens here, the feature is approved.
+    git fetch --all
+
+    # Ensure we're up-to-date with dce-release. Squash only the commits in this new feature branch
+    git rebase -i origin/dce-release
+    # Ensure you're on your feature branch
+    # Merge dce-release into our branch accepting our version of the branch. h/t http://stackoverflow.com/a/2862938/4279033
+    # As a final check, look at the last commit on upstream/master and ensure the SHA is the same as the SHA in here.
+    git merge -s ours dce-release
+    git checkout dce-release
+    git merge your-update-branch-name
+    git push
