@@ -56,7 +56,8 @@ Class ("paella.plugins.MultipleQualitiesPlugin",paella.ButtonPlugin,{
 		
 		// Sort the available resolutions
 		function sortfunc(a,b){
-			return parseInt(a.res.h) >= parseInt(b.res.h);
+			// #DCE MATT-1302 Sort Function fix for Safari
+			return (parseInt(a.res.h) >= parseInt(b.res.h)? 1 : -1);
 		}
 		this.availableMasters.sort(sortfunc);
 		this.availableSlaves.sort(sortfunc);		
