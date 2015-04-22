@@ -56,7 +56,8 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     } else {
       chosenProfile = profileOrder[lastProfileIndex + 1];
     }
-
+    overlayContainer = paella.player.videoContainer.overlayContainer;
+    overlayContainer.clear();
     paella.events.trigger(
       paella.events.setProfile,{
         profileName: chosenProfile
