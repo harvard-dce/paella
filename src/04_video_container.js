@@ -66,7 +66,7 @@ Class ("paella.VideoOverlay", paella.DomNode,{
 			}
 			catch (e) {
 				//#DCE leave a note
-				console.log("unable to remove element" + element);
+				base.log.debug("unable to remove element" + element);
 			}
 		}
 	},
