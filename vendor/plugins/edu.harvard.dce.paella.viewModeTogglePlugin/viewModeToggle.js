@@ -65,7 +65,7 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     );
   },
   checkEnabled:function(onSuccess) {
-    onSuccess(true);
+    onSuccess(paella.player.videoContainer.slaveVideo() !== undefined);
   }
 });
 
