@@ -36,8 +36,14 @@ Class ("paella.plugins.VolumeRangePlugin", paella.ButtonPlugin,{
 
 	storeVolume:function(){
 		var self = this;
-		self._tempSlaveVolume = paella.player.videoContainer.slaveVideo().volume();
-		self._tempMasterVolume = paella.player.videoContainer.masterVideo().volume();
+    // DCE - ensure a video is there before doing stuff to it.
+    if (paella.player.videoContainer.slaveVideo() !== undefined) {
+      self._tempSlaveVolume = paella.player.videoContainer.slaveVideo().volume();
+    }
+    if (paella.player.videoContainer.masterVideo() !== undefined) {
+      self._tempMasterVolume = paella.player.videoContainer.masterVideo().volume();
+    }
+    // /DCE
 	},
 
 	loadStoredVolume:function(params){
