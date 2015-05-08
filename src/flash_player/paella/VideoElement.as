@@ -91,11 +91,7 @@ public class VideoElement extends Sprite implements IMediaElement {
 		
 		loadUrl(url);
 
-		NetConnection.prototype.onBWDone = function(p_bw) {
-			JavascriptTrace.debug("onBWDone: "+p_bw);
-		}
 		_connection = new NetConnection();
-		
 		_connection.client = { onBWDone: function():void{} };
 		_connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 		_connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
@@ -109,17 +105,6 @@ public class VideoElement extends Sprite implements IMediaElement {
     }
 	
 	protected function loadUrl(url:String) {
-		var protocolPattern:RegExp = /^\w+(?=:\/\/)/;
-		var domainWithOptionalProtocol:RegExp = /^(\w+:\/\/)?[\w+.]+(?=(\/|:\d+))/;
-		var portNumberPattern:RegExp = /(?<=\:)\d+(?=\/)/g;
-		
-		var proto:String = url.match(protocolPattern)[0];
-		var server:String = url.match(domainWithOptionalProtocol)[0];
-		var port:String = url.match(portNumberPattern)[0];
-		if (port) server += ":" + port;
-		server += "/";
-		var directories:String = url.replace(server,"");
-		
 		if (url.match(/^rtmp(s|t|e|te)?\:\/\//)) {
 			_isRTMP = true;
 			var match:Array = url.match(/(.*)\/((flv|mp4|mp3):.*)/);
@@ -129,14 +114,9 @@ public class VideoElement extends Sprite implements IMediaElement {
 				_streamResource = match[2];
 			}
 			else {
-				//var server:String = URLUtil.getServerNameWithPort(url);
-				_streamServer = server + directories.split('/')[0];
-				_streamResource = url.replace(_streamServer,"");
+				_streamServer = url.replace(/\/[^\/]+$/,"/");
+				_streamResource = url.split("/").pop();
 			}
-			
-			JavascriptTrace.debug("RTMP stream detected: ");
-			JavascriptTrace.debug("server: " + _streamServer);
-			JavascriptTrace.debug("resource: " + _streamResource);
 		}
 		else {
 			_isRTMP = false;
@@ -154,14 +134,15 @@ public class VideoElement extends Sprite implements IMediaElement {
 	
 	private function timerHandler(e:TimerEvent):void {
 		if (_stream) {
+			if (!_isPaused) {
+				JavascriptTrace.debug("Timeupdate: " + _stream.time);
+				sendEvent(HtmlEvent.TIMEUPDATE);
+			}
 			_bufferedTime = _stream.bytesLoaded;
 			_bytesLoaded = _stream.bytesLoaded;
 		    _bytesTotal = _stream.bytesTotal;
-			if (!_isPaused) {
-				sendEvent(HtmlEvent.TIMEUPDATE);
-			}
 
-		    if (_bytesLoaded < _bytesTotal && !_isRTMP) {
+		    if (_bytesLoaded < _bytesTotal) {
 		    	sendEvent(HtmlEvent.PROGRESS);
 		    }
 		}
@@ -184,12 +165,12 @@ public class VideoElement extends Sprite implements IMediaElement {
 
 			case "NetConnection.Connect.Success":
 				createNetStream();
-				break;
-			case "NetConnection.Connect.Closed":
-				JavascriptTrace.debug("Connection closed");
+				if (_autoplay) {
+					play();
+				}
 				break;
 			case "NetStream.Play.StreamNotFound":
-				JavascriptTrace.error("Unable to locate video:" + _streamResource);
+				JavascriptTrace.error("Unable to locate video");
 				break;
 		}
 	}
@@ -209,10 +190,6 @@ public class VideoElement extends Sprite implements IMediaElement {
 	    _videoWidth = info.width;
 	    _videoHeight = info.height;
 		_canPlay = true;
-		
-		JavascriptTrace.debug("Duration: " + _duration);
-		JavascriptTrace.debug("Frame rate: " + _framerate);
-		JavascriptTrace.debug("Size: " + _videoWidth + "x" + _videoHeight);
 
 	    // set size?
 		sendEvent(HtmlEvent.LOADEDDATA);
@@ -220,24 +197,18 @@ public class VideoElement extends Sprite implements IMediaElement {
 	    sendEvent(HtmlEvent.LOADEDMETADATA);
 		sendEvent(HtmlEvent.PROGRESS);
 		sendEvent(HtmlEvent.TIMEUPDATE);
-		
-		if (!_autoplay) {
-			pause();
-		}
-		_autoplay = true;
 	}
 	
 	public function cuePointHandler(info:Object):void {
 		
 	}
 	
-	public function onBWDone(oObject1:Object):void	{
-		JavascriptTrace.debug("onBWDone");
+	public function onBWDone():void	{
+		
 	}
 	
 	protected function connect():void {
 		if (_isRTMP) {
-			JavascriptTrace.debug("Connecting to RTMP server: " + _streamServer);
 			_connection.connect(_streamServer);
 		}
 		else {
@@ -250,16 +221,12 @@ public class VideoElement extends Sprite implements IMediaElement {
 			JavascriptTrace.debug("Connected");
 			_stream = new DynamicNetStream(_connection);
 			_video.attachNetStream(_stream);
-			_stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler, false, 0, true);
-			_stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler, false, 0, true);
+			_stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+			_stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
 			_stream.bufferTime = _bufferTime;
-			_stream.client = {};
-			_stream.client.onBWDone = onBWDone;
-			_stream.client.onMetaData = metaDataHandler;
-			_stream.client.onCuePoint = cuePointHandler;
+			_stream.onMetaData = metaDataHandler;
+			_stream.onCuePoint = cuePointHandler;
 			_soundTransform = new SoundTransform();
-			
-			play();
 		}
 	}
 	
@@ -359,13 +326,7 @@ public class VideoElement extends Sprite implements IMediaElement {
 	private function sendEvent(eventName:String):void {
 		// calculate this to mimic HTML5
 		_bufferedTime = _bytesLoaded / _bytesTotal * _duration;
-		if (!_isRTMP) {
-			JavascriptTrace.debug(eventName + " - buffered time: " + _bufferedTime + ", current time: " + currentTime());
-		}
-		else {
-			JavascriptTrace.debug(eventName + " - current time: " + currentTime());
-		}
-		
+		JavascriptTrace.debug(eventName + " - buffered time: " + _bufferedTime + ", current time: " + currentTime());
 
 		// build JSON
 		var values:String =
