@@ -304,14 +304,6 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	
 	_showPosterFrame:true,
 
-	// #DCE, MATT-381 give max size of container
-	// TODO: verify if this now handled by "paella.ProfileFrameStrategy"
-	isMaxSize: true,
-
-	// #DCE, MATT-381 give max size of container
-	// TODO: verify if this now handled by "paella.ProfileFrameStrategy"
-	isMaxSize: true,
-
 	initialize:function(id) {
 		this.parent(id);
 		var thisClass = this;
