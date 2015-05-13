@@ -316,7 +316,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	},
 	
 	setPosterFrame:function(url) {
-		if (this._posterFrame===undefined) {
+		if (this._posterFrame != undefined) {
 			this._posterFrame = url;
 			var posterFrame = document.createElement('img');
 			posterFrame.src = url;
