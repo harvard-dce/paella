@@ -66,7 +66,11 @@ Class ("paella.VideoOverlay", paella.DomNode,{
 			}
 			catch (e) {
 				//#DCE leave a note
+<<<<<<< HEAD
 				base.log.debug("unable to remove element" + element);
+=======
+				console.log("unable to remove element" + element);
+>>>>>>> de801c7... DCE customizations roll-up commit.
 			}
 		}
 	},
@@ -363,6 +367,10 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 	_defaultSlaveVolume:1,
 	
 	_showPosterFrame:true,
+
+	// #DCE, MATT-381 give max size of container
+	// TODO: verify if this now handled by "paella.ProfileFrameStrategy"
+	isMaxSize: true,
 
 	// #DCE, MATT-381 give max size of container
 	// TODO: verify if this now handled by "paella.ProfileFrameStrategy"
@@ -683,6 +691,14 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		var slaveVolume = slaveVideo && slaveVideo.volume();		
 		if (masterVideo) masterVideo.unload();
 		if (slaveVideo) slaveVideo.unload();
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> a15bf20... DCE customizations roll-up commit.
+=======
+
+>>>>>>> de801c7... DCE customizations roll-up commit.
 		this.setMasterQuality(masterQuality);
 		this.setSlaveQuality(slaveQuality);
 		
@@ -743,6 +759,7 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 			this.setMonoStreamMode(true);
 		}
 	},
+<<<<<<< HEAD
 	setAutoplay:function() {
 		this._autoplay = true;
 		if (this.masterVideo()) {
@@ -753,6 +770,9 @@ Class ("paella.VideoContainer", paella.VideoContainerBase,{
 		}
 	},
 	
+=======
+
+>>>>>>> de801c7... DCE customizations roll-up commit.
 	onVideoLoaded:function(sender) {
 		var This = this;
 		if ((this.isMonostream && this.masterVideo() && this.masterVideo().isReady()) ||

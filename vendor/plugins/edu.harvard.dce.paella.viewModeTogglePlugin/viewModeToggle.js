@@ -56,8 +56,7 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     } else {
       chosenProfile = profileOrder[lastProfileIndex + 1];
     }
-    overlayContainer = paella.player.videoContainer.overlayContainer;
-    overlayContainer.clear();
+
     paella.events.trigger(
       paella.events.setProfile,{
         profileName: chosenProfile
@@ -65,7 +64,7 @@ Class ("paella.plugins.ViewModeTogglePlugin",paella.ButtonPlugin,{
     );
   },
   checkEnabled:function(onSuccess) {
-    onSuccess(paella.player.videoContainer.slaveVideo() !== undefined);
+    onSuccess(true);
   }
 });
 
