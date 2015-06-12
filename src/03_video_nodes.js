@@ -307,7 +307,7 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 			&& params.paused == false
 			&& params.duration == 0) {
 			params.duration = this.getDurationFromMediapackage(params.duration);
-        }
+                }
 		if (eventName!="loadedmetadata" && eventName!="pause" && params.duration!=0 && !this._isReady) {
 			this._isReady = true;
 			this._duration = params.duration;
