@@ -300,6 +300,14 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	},
 
 	processEvent:function(eventName,params) {
+		// #DCE MATT-1355, Live player mute button shows muted when live stream is not muted
+		// This conditional gets the duration from the MP
+		if (eventName!="loadedmetadata" && eventName!="pause" && !this._isReady
+			&& params.muted == false
+			&& params.paused == false
+			&& params.duration == 0) {
+			params.duration = this.getDurationFromMediapackage(params.duration);
+        }
 		if (eventName!="loadedmetadata" && eventName!="pause" && params.duration!=0 && !this._isReady) {
 			this._isReady = true;
 			this._duration = params.duration;
@@ -314,7 +322,22 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 			base.log.debug("Flash video event: " + eventName);
 		}
 	},
-	
+
+	// #DCE MATT-1355, Live player mute button shows muted when live stream is not muted
+	// The following retrieves duration from mediapackgae, used when the liveStream does not provide duration
+	getDurationFromMediapackage: function (paramDuration) {
+		if (paella && paella.matterhorn
+			&& paella.matterhorn.episode
+			&& paella.matterhorn.episode.mediapackage
+			&& paella.matterhorn.episode.mediapackage.duration) {
+			var tempDur = paella.matterhorn.episode.mediapackage.duration;
+			if (parseInt(tempDur, 10)) {
+				paramDuration =  parseInt(tempDur, 10);
+			}
+		}
+		return paramDuration;
+	},
+
 	setPosterFrame:function(url) {
 		if (this._posterFrame != undefined) {
 			this._posterFrame = url;
