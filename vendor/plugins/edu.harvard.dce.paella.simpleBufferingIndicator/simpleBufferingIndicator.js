@@ -6,7 +6,8 @@ Class ("paella.plugins.SimpleBufferingIndicator", paella.EventDrivenPlugin, {
   overlayTimers: [],
   loaderPosition: 0,
   getEvents: function() {
-    return [paella.events.singleVideoReady, paella.events.videoUnloaded, paella.events.loadPlugins, paella.events.play];
+    // return [paella.events.singleVideoReady, paella.events.videoUnloaded, paella.events.loadPlugins, paella.events.play];
+    return [paella.events.videoUnloaded, paella.events.loadPlugins, paella.events.play];
   },
 
   showBufferingIndicator: function(event){
@@ -41,27 +42,30 @@ Class ("paella.plugins.SimpleBufferingIndicator", paella.EventDrivenPlugin, {
     // This catches buffering events when seeking
     masterVideo.on('waiting', { thisClass: thisClass }, thisClass.showBufferingIndicator);
     // This detects that a video is playing
-    masterVideo.on('playing seeked', { thisClass: thisClass }, thisClass.hideBufferingIndicator);
+    masterVideo.on('timeupdate', { thisClass: thisClass }, thisClass.hideBufferingIndicator);
+    // masterVideo.on('timeupdate', {}, function(event) { console.log(event); });
   },
 
   onEvent: function(event, params) {
     var thisClass = this;
 
+    // console.log('event: ', event);
     // This catches events exclusively due to interactions with the paella UI
     if (event == 'paella:play' || event == 'paella:videoUnloaded' || event == 'paella:loadPlugins') {
       thisClass.showBufferingIndicator({ data: { thisClass: thisClass}} );
     }
 
-    videoTimer = new base.Timer(function(timer) {
+    window.setTimeout(function() {
       // Not a fan, but there are no useful events fired internally (that I can find)
       // that run when a video is loaded or reloaded.
-      // console.log('firing the timer');
-      if ($('video.masterVideo').length > 0) {
-        thisClass.bindEventsToMasterVideo();
+      var masterVideo = $('video.masterVideo');
+      if (masterVideo.length > 0) {
+        if (masterVideo.data('eventsBound') != true) {
+          thisClass.bindEventsToMasterVideo();
+        }
+        masterVideo.data('eventsBound', true);
       }
-      timer.repeat = false;
-    }, 100);
-    videoTimer.repeat = true;
+    }, 500);
   },
 
   checkEnabled:function(onSuccess) {

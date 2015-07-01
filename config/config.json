@@ -1,18 +1,13 @@
 {
     "dceMaxWidth":true,
 	"player":{
-<<<<<<< HEAD
         "defaultProfile":"full",
         "profileFrameStrategy": "paella.ProfileFrameStrategy",
 		"videoQualityStrategy": "paella.BestFitVideoQualityStrategy",
-=======
-		"defaultProfile": "full",
-        "profileFrameStrategy": "paella.ProfileFrameStrategy",
->>>>>>> ff4a51c... CS50-inspired paella theme. Includes:
 		"methods":[{"name":"streaming","enabled":true},
 				   {"name":"html","enabled":true},
 				   {"name":"flash","enabled":true},
-                		   {"name":"image","enabled":true}],
+				   {"name":"image","enabled":true}],
         "audio": {
             "master": 1.0,
             "slave": 0.0
@@ -25,7 +20,7 @@
 	"editor":{
 		"enabled":false
 	},
-        "defaultProfile":"professor_slide",
+		"defaultProfile":"professor_slide",
 	"data":{
 		"enabled":true,
 		"dataDelegates":{
@@ -58,7 +53,6 @@
 			"es.upv.paella.captionsPlugin": {"enabled":true, "searchOnCaptions":true},
 			"es.upv.paella.extendedTabAdapterPlugin": {"enabled":true}, 			
 			"es.upv.paella.footprintsPlugin": {"enabled":false},
-<<<<<<< HEAD
 			"es.upv.paella.frameControlPlugin":  {"enabled": true},
 			"es.upv.paella.fullScreenButtonPlugin": {"enabled":true, "reloadOnFullscreen":{ "enabled":true, "keepUserSelection":true }},
 			"es.upv.paella.helpPlugin": {"enabled":true, "langs":["en","es"]},
@@ -108,24 +102,13 @@
 			"es.upv.paella.editor.trackBreaksPlugin": {"enabled":true},
 			"es.upv.paella.editor.trimmingTrackPlugin": {"enabled":true},
 
-            "//****": "DCE plugin",
-            "edu.harvard.dce.paella.viewModeTogglePlugin": {"enabled":true},
-=======
-			"es.upv.paella.playbackRate": {"enabled":true},
-            "es.upv.paella.helpPlugin": {"enabled":true, "langs":["en","es"]},
-            "es.upv.paella.ZoomPlugin": {"enabled": true, "maxZoom":500, "minZoom":100, "zoomIncr":10},
-            "es.upv.paella.fullScreenButtonPlugin": {"enabled":true, "reloadOnFullscreen":{ "enabled":true, "keepUserSelection":true }},
-            "es.upv.paella.extendedProfilesPlugin": {"enabled":false, "reloadOnFullscreen":"reload" },
-            "es.upv.paella.themeChooserPlugin":  {"enabled":false},
-            "es.upv.paella.viewModePlugin": { "enabled":false},
-            "edu.harvard.dce.paella.viewModeTogglePlugin": {"enabled":true},
-            "es.upv.paella.socialPlugin": { "enabled":false}
->>>>>>> ff4a51c... CS50-inspired paella theme. Includes:
+			"//****": "DCE plugin",
+			"edu.harvard.dce.paella.viewModeTogglePlugin": {"enabled":true},
 		}
 	},
     "standalone" : {
         "reposiroty": "../repository/"
- 	},
+	},
     "skin": {
         "default": "cs50"
     }

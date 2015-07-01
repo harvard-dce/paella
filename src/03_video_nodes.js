@@ -330,7 +330,8 @@ Class ("paella.FlashVideo", paella.VideoElementBase,{
 	},
 	
 	setPosterFrame:function(url) {
-		if (this._posterFrame != undefined) {
+                // #DCE change comparator from paella 4.1.1
+		if (this._posterFrame === undefined) {
 			this._posterFrame = url;
 			var posterFrame = document.createElement('img');
 			posterFrame.src = url;

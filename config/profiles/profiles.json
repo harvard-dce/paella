@@ -13,8 +13,6 @@
 	"slide_professor":{
 		"name":{"es":"Presentación y presentador"},
 		"icon":"slide_professor_icon.png",
-        "dceWidthType": "double",
-        "dceBufferSize": 12,
 		"masterVideo":{"content":"presenter","rect":[
 			{"aspectRatio":"16/9","left":"712","top":"302","width":"560","height":"315"},
 			{"aspectRatio":"16/10","left":"712","top":"267","width":"560","height":"350"},
