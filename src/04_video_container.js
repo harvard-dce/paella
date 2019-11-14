@@ -14,6 +14,8 @@
 	permissions and limitations under the License.
 */
 
+/* #DCE OPC-374, OPC-357 MATT-2502 override default video rectangle dimensions to fit extra wide live combo */
+
 (() => {
 
 class BackgroundContainer extends paella.DomNode {
@@ -129,17 +131,18 @@ paella.VideoOverlay = VideoOverlay;
 class VideoWrapper extends paella.DomNode {
 	constructor(id, left, top, width, height) {
 		var relativeSize = new paella.RelativeVideoSize();
-		var percentTop = relativeSize.percentVSize(top) + '%';
-		var percentLeft = relativeSize.percentWSize(left) + '%';
-		var percentWidth = relativeSize.percentWSize(width) + '%';
-		var percentHeight = relativeSize.percentVSize(height) + '%';
+		// #DCE give full dimensions of initial video if sizes were not passed
+		var percentTop = relativeSize.percentVSize(top) || 0 + '%';
+		var percentLeft = relativeSize.percentWSize(left) || 0 + '%';
+		var percentWidth = relativeSize.percentWSize(width) || 100 + '%';
+		var percentHeight = relativeSize.percentVSize(height) || 100 + '%';
 		var style = {
 			top: percentTop,
 			left: percentLeft,
 			width: percentWidth,
 			height: percentHeight,
 			position: 'absolute',
-			zIndex: GlobalParams.video.zIndex,
+			//zIndex: GlobalParams.video.zIndex, //#DCE use from style
 			overflow: 'hidden'
 		};
 		super('div',id,style);
@@ -150,6 +153,17 @@ class VideoWrapper extends paella.DomNode {
 	setRect(rect,animate) {
 		this._rect = JSON.parse(JSON.stringify(rect));
 		var relativeSize = new paella.RelativeVideoSize();
+		// #DCE MATT-2502 override the UPV default relative video container ratio
+		// *ONLY* for the extra short and wide "3.55/1" ratio, 16x9+16x9 (32x9), DCE live stream.
+		// The override has to be set globally for access by all instances of new paella.RelativeVideoSize().
+		if (paella.dce && paella.player.videoContainer.isMonostream && rect.aspectRatio == "3.55/1") {
+		  // #DCE MH-relative size old style intercept of the paella.RelativeVideoSize()
+		  // #DCE OPC-357 TODO: hoping RelativeVideoSize.w and h can be overridden in newer Paella
+		  // [followup] Sadly no, still needed for UPV Paella v6.2.0
+		  paella.dce.relativeVideoSize = paella.dce.relativeVideoSize || {};
+		  paella.dce.relativeVideoSize.h=rect.height;
+		  paella.dce.relativeVideoSize.w=rect.width;
+		}
 		var percentTop = relativeSize.percentVSize(rect.top) + '%';
 		var percentLeft = relativeSize.percentWSize(rect.left) + '%';
 		var percentWidth = relativeSize.percentWSize(rect.width) + '%';
@@ -228,12 +242,23 @@ class VideoContainerBase extends paella.DomNode {
 		this.slaveVideoData = null;
 		this.currentMasterVideoData = null;
 		this.currentSlaveVideoData = null;
+		this._maxSyncDelay = 0.3; // #DCE OPC-401
+		this._syncHits = 0;  // #DCE OPC-407
+		this._videoSyncTimeMillis = 5000;
 		this._force = false;
 		this._playOnClickEnabled =  true;
 		this._seekDisabled =  false;
-		
+		this._seekingPlayers = new Set(); //#DCE OPC-407 array of players in seeking state
+		this._waitingToPlayPlayers = new Set(); //#DCE OPC-407 array of players in waiting to play state
+		// #DCE OPC-401
+		setTimeout(function() {
+		  let repeat = true;
+		  paella.player.videoContainer.syncVideos(repeat);
+		}, this._videoSyncTimeMillis);
+
 		$(this.domElement).click((evt) => {
-			if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
+		  // #DCE OPC-384 enable play button on screen for mobile
+			// if (this.firstClick && base.userAgent.browser.IsMobileVersion) return;
 			if (this.firstClick && !this._playOnClickEnabled) return;
 			paella.player.videoContainer.paused()
 				.then((paused) => {
@@ -254,7 +279,12 @@ class VideoContainerBase extends paella.DomNode {
 		});
 
 		let endedTimer = null;
+		let thisClass = this; // #DCE OPC-407
 		paella.events.bind(paella.events.endVideo,(event) => {
+		  // #DCE OPC-407 make sure state is paused and set to 0 time
+		  thisClass.pause();
+		  thisClass.seekToTime(0);
+
 			if (endedTimer) {
 				clearTimeout(endedTimer);
 				endedTimer = null;
@@ -281,6 +311,108 @@ class VideoContainerBase extends paella.DomNode {
 		if (changed) {
 			paella.events.trigger(paella.events.seekAvailabilityChanged, { disabled:this._seekDisabled, enabled:!this._seekDisabled })
 		}
+	}
+
+	// #DCE OPC-407 only play if all players are not seeking
+	playIfNonAreSeeking (player) {
+		let seekingCount, waitingForPlayCount;
+		if (!player || !player.stream) return;
+		this._seekingPlayers.delete(player);
+		this._waitingToPlayPlayers.add(player);
+		seekingCount = this._seekingPlayers.size;
+		waitingForPlayCount = this._waitingToPlayPlayers.size;
+		base.log.debug(`HTML5: PLAY? playIfNonAreSeeking '${player.stream.content}' ('${player._identifier}'), seeking players: '${seekingCount}', waiting to player players: '${waitingForPlayCount}'.`);
+
+		// #DCE OPC-407 helpful debugging
+		this._waitingToPlayPlayers.forEach(p => base.log.debug(`HTML5: PLAY? Waiting to Play '${p.stream.content}'`));
+		this._seekingPlayers.forEach(p => base.log.debug(`HTML5: PLAY? Still seeking '${p.stream.content}'`));
+
+		if (seekingCount === 0) {
+			this.currentTime().then(currentTime => {
+				this._waitingToPlayPlayers.forEach(p =>  {
+					let timeOffset = Math.abs(p.video.currentTime - currentTime);
+					if (timeOffset > 0.5) {
+						base.log.debug(`HTML5: PLAY? compensating for time offset '${timeOffset}' for '${p.stream.content}' '${p._identifier}'.`);
+						p.video.currentTime = currentTime;
+					}
+					p.play();
+					base.log.debug(`HTML5: PLAY? starting play for '${p.stream.content}' at '${p.video.currentTime}'.`);
+				});
+				this._waitingToPlayPlayers = new Set();
+			});
+		} else {
+			base.log.debug(`HTML5: PLAY? there are '${seekingCount}' players still seeking, '${player.stream.content}' will wait until all finish seeking.`);
+		}
+	}
+
+	// #DCE OPC-354, OPC-389, OPC-401
+	// https://github.com/polimediaupv/paella/issues/447
+
+	repeatSyncVideo(repeat) {
+	  repeat = repeat || true;
+	  let self = this;
+	  if (repeat) {
+	    setTimeout(function () {
+	      paella.player.videoContainer.syncVideos(true);
+	    }, self._videoSyncTimeMillis);
+	  }
+	}
+
+	syncVideos(repeat) {
+	  repeat = repeat || false;
+	  let self = this;
+	  if (paella.player.videoContainer._seekingPlayers.size > 0) {
+	    base.log.debug(`HTML5: Video Seek is already running, not synching Videos`);
+	    this.repeatSyncVideo(repeat);
+	    return;
+	  }
+	  if (base.userAgent.system.iPhone) { // #DCE only show one video on iPhone, for now, keep hiden one paused
+	    base.log.debug(`HTML5: Video synch disabled for iPhone, not synching Videos`);
+	    return;
+	  }
+	  // #DCE OPC-407 synch videos not matching the master
+	  paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+		  let currentTime = videoData.currentTime;
+			let streams = paella.player.videoContainer.streamProvider.videoPlayers;
+			let promises = [];
+			let updated = [];
+			let shortbuffer = 0.1;
+			let seekTime = shortbuffer;
+			let isPaused = videoData.paused;
+			streams.forEach(v => {
+			 if (paella.player.videoContainer.isMonostream || !v.video) {
+			   return;
+			 }
+			 if (v._isSeeking) {
+			   base.log.debug(`HTML5: Not synching video=${v._identifier}, content=${v._stream.content} is already seeking`);
+			   return;
+			 }
+			 let diff = Math.abs(v.video.currentTime - currentTime);
+			 base.log.debug(`HTML5-SYNC: About to check sync on '${v._stream.content}' (${v._identifier}) paused='${v.video.paused}' timediff=${diff} currentTime=${v.video.currentTime}`);
+			 if (v !== paella.player.videoContainer.streamProvider.mainAudioPlayer && !v.video.paused && diff > self._maxSyncDelay) {
+			   let seekTime = shortbuffer > currentTime ? shortbuffer : parseFloat(currentTime).toFixed(3);
+			   if (!isPaused) {
+			     seekTime += (self._maxSyncDelay - shortbuffer); // add future buffer to catch running audio
+			   }
+			   base.log.debug(`HTML5: About to sync '${v._stream.content}' (${v._identifier}) paused=${v.video.paused}, timediff=${diff}, settingToTime=${seekTime}`);
+			    updated.push(v);
+			    promises.push(v.setCurrentTime(seekTime));
+			    self._syncHits++;
+			  }
+			});
+			Promise.all(promises).then(function () {
+			 if (updated.length > 0) {
+			   base.log.debug(`HTML5: Synced ${updated.length} videos for ${seekTime}, number of times synched = ${self._syncHits}`);
+			 }
+			 if (repeat) {
+			   setTimeout(function () {
+			     paella.player.videoContainer.syncVideos(true);
+			     }, self._videoSyncTimeMillis);
+			   }
+			 }).catch(error => {
+			   base.log.debug(`HTML5: Unable to synch video(s) to time '${seekTime}': ${error.message}`);
+			 });
+		});
 	}
 
 	triggerTimeupdate() {
@@ -351,8 +483,14 @@ class VideoContainerBase extends paella.DomNode {
 			return;
 		}
 		var thisClass = this;
+		// #DCE OPC_407 start the seek load spinner
+		paella.player.loader.seekload();
+		base.log.debug(`HTML5: seekTo before, percent = ${newPositionPercent}`);
 		this.setCurrentPercent(newPositionPercent)
 			.then((timeData) => {
+				// #DCE OPC_407 end the seek load spinner
+				base.log.debug(`HTML5: seekTo after, percent = ${newPositionPercent}`);
+				paella.player.loader.loadComplete();
 				thisClass._force = true;
 				this.triggerTimeupdate();
 				paella.events.trigger(paella.events.seekToTime,{ newPosition:timeData.time });
@@ -365,8 +503,10 @@ class VideoContainerBase extends paella.DomNode {
 			console.log("Seek is disabled");
 			return;
 		}
+		base.log.debug(`HTML5: seekToTime before, time = ${time}`); //#DCE OPC-407 seek log
 		this.setCurrentTime(time)
 			.then((timeData) => {
+				base.log.debug(`HTML5: seekToTime after, time = ${time}`); //#DCE OPC-407 seek log
 				this._force = true;
 				this.triggerTimeupdate();
 				let percent = timeData.time * 100 / timeData.duration;
@@ -482,6 +622,7 @@ class VideoContainerBase extends paella.DomNode {
 					else {
 						position = percent * duration / 100;
 					}
+					base.log.debug(`HTML5: in setCurrentPercent '${percent}' before call setCurrentTime to '${position}'`); //#DCE OPC-407
 					return this.setCurrentTime(position);
 				})
 				.then(function(timeData) {
@@ -705,11 +846,13 @@ class StreamProvider {
 
 		this.players.forEach((player) => {
 			promises.push(player[fnName](...functionArguments));
+			base.log.debug(`HTML5: Video pushing promise '${fnName}' args '${functionArguments}' on player '${player.stream.content}' '${player._identifier}'`);
 		});
 
 		return new Promise((resolve,reject) => {
 			Promise.all(promises)
 				.then(() => {
+				  base.log.debug(`HTML5: promises finished '${fnName}' args '${functionArguments}'`);
 					if (fnName=='play' && !this._firstPlay) {
 						this._firstPlay = true;
 						if (this._startTime) {
@@ -837,28 +980,48 @@ class VideoContainer extends paella.VideoContainerBase {
 
 	setCurrentTime(time) {
 		return new Promise((resolve,reject) => {
+			let wasPlaying = false;
 			this.trimming()
 				.then((trimmingData) => {
 					if (trimmingData.enabled) {
 						time += trimmingData.start;
+
 						if (time<trimmingData.start) {
 							time = trimmingData.start;
 						}
+
 						if (time>trimmingData.end) {
 							time = trimmingData.end;
 						}
 					}
-					return this.streamProvider.callPlayerFunction('setCurrentTime',time);
+					//#DCE OPC-407 pause if not already paused before setting time
+					return this.paused();
 				})
-			
+				.then(paused => {
+					if (! paused) {
+						wasPlaying = true;
+						return this.pause();
+					} else {
+						return Promise.resolve();
+					}
+				})
+				.then(() => {
+					return this.streamProvider.callPlayerFunction('setCurrentTime', time);
+				})
+				.then(() => {
+					//#DCE OPC-407 play if was playing before setting time
+					if (wasPlaying) {
+						return this.play();
+					} else {
+						return Promise.resolve();
+					}
+				})
 				.then(() => {
 					return this.duration(false);
 				})
-
 				.then((duration) => {
 					resolve({ time:time, duration:duration });
 				})
-
 				.catch((err) => {
 					reject(err);
 				})
@@ -872,6 +1035,10 @@ class VideoContainer extends paella.VideoContainerBase {
 
 			p.then((t) => {
 				trimmingData = t;
+				// #DCE protection from early load plugin logging
+				if (!this.masterVideo()) {
+				  return 0;
+				}
 				return this.masterVideo().currentTime();
 			})
 
@@ -879,6 +1046,7 @@ class VideoContainer extends paella.VideoContainerBase {
 				if (trimmingData.enabled) {
 					time = time - trimmingData.start;
 				}
+				if (time < 0) time = 0;
 				resolve(time)
 			});
 		});
@@ -1003,19 +1171,26 @@ class VideoContainer extends paella.VideoContainerBase {
 	setAudioTag(lang) {
 		return new Promise((resolve) => {
 			let audioSet = false;
-			let firstAudioPlayer = null;
 			let promises = [];
-			this.streamProvider.players.forEach((player) => {
-				if (!firstAudioPlayer) {
-					firstAudioPlayer = player;
-				}
-
-				if (!audioSet && player.stream.audioTag==lang) {
-					audioSet = true;
-					this._audioPlayer = player;
-				}
-				promises.push(player.setVolume(0));
+			let This = this;
+			let firstAudioPlayer = this.streamProvider.players.find((player) => {
+			  return player.stream.audioTag==lang;
 			});
+			if (firstAudioPlayer) {
+					audioSet = true;
+					this._audioPlayer = firstAudioPlayer;
+			} else {
+			  this.streamProvider.players.forEach((player) => {
+				  if (!firstAudioPlayer) {
+					  firstAudioPlayer = player;
+				  }
+				  if (!audioSet && player.stream.audioTag==lang) {
+					  audioSet = true;
+					  this._audioPlayer = player;
+				  }
+				  promises.push(player.setVolume(0));
+			  });
+			}
 
 			// NOTE: The audio only streams must define a valid audio tag
 			if (!audioSet && this.streamProvider.mainVideoPlayer) {
@@ -1131,7 +1306,11 @@ class VideoContainer extends paella.VideoContainerBase {
 							}
 							paella.events.trigger(paella.events.timeupdate, { videoContainer:this, currentTime:current, duration:duration });
 							if (current>=duration) {
+								// #DCE OPC-407 log end of video
+								base.log.debug(`HTML5: end of video, about to pause and set all times to 0: currentTime=${current}, duration=${duration}`);
 								this.streamProvider.callPlayerFunction('pause');
+								this.streamProvider.callPlayerFunction('setCurrentTime', 0); // #DCE OPC-407 mimic 5x
+
 								if (endedTimer) {
 									clearTimeout(endedTimer);
 									endedTimer = null;

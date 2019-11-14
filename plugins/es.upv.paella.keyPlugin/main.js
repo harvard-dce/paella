@@ -1,3 +1,8 @@
+/*
+ * #DCE OPC-384 alt-M mute to mute, but only mute.
+ * Ref https://github.com/polimediaupv/paella/pull/438
+*/
+
 paella.addPlugin(() => {
     return class DefaultKeyPlugin extends paella.KeyPlugin {
         checkEnabled(onSuccess) {
@@ -67,12 +72,8 @@ paella.addPlugin(() => {
 		}
 	
 		mute() {
-			var videoContainer = paella.player.videoContainer;
-			videoContainer.volume().then(function(volume){
-				var newVolume = 0;
-				if (volume==0) { newVolume = 1.0; }
-				paella.player.videoContainer.setVolume({ master:newVolume, slave: 0});
-			});
+			// #DCE override ref https://github.com/polimediaupv/paella/pull/438 
+			paella.player.videoContainer.setVolume(0);
 		}
 	
 		volumeUp() {

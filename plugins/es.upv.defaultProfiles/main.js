@@ -1,3 +1,5 @@
+// #DCE OPC-374, OPC-357 overridding plugins/es.upv.defaultProfiles/main.js
+// for MATT-2502 adding 16x9+16x9 (3.55/1) monostream live stream ratio
 
 paella.addPlugin(function() {
     return class SingleStreamProfilePlugin extends paella.EventDrivenPlugin {
@@ -43,14 +45,18 @@ paella.addPlugin(function() {
                                                 { aspectRatio:"1.85/1",left:0,top:14,width:1280,height:692 },
                                                 { aspectRatio:"2.35/1",left:0,top:87,width:1280,height:544 },
                                                 { aspectRatio:"2.41/1",left:0,top:94,width:1280,height:531 },
-                                                { aspectRatio:"2.76/1",left:0,top:128,width:1280,height:463 }
+                                                { aspectRatio:"2.76/1",left:0,top:128,width:1280,height:463 },
+                                                //#DCE MATT-2502, OPC-374 add 16x9+16x9 (3.55/1) monostream live stream ratio
+                                                // Using "top:0", because relative resize box is also being overridden to 3.55/1
+                                                { aspectRatio:"3.55/1",left:0,top:0,width:960,height:270 }
+                                                // end #DCE
                                             ],
                                             visible:true,
                                             layer:1
                                         }
                                     ],
                                     background:{content:"slide_professor_paella.jpg",zIndex:5,rect:{left:0,top:0,width:1280,height:720},visible:true,layer:0},
-                                    logos:[{content:"paella_logo.png",zIndex:5,rect:{top:10,left:10,width:49,height:42}}],
+                                    logos:[], //#DCE OPC-374 hide paella logo overlay :(
                                     buttons: [],
                                     onApply: function() {
                                     }

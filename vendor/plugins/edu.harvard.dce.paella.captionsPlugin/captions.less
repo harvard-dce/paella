@@ -1,0 +1,151 @@
+@menuBGColor: #262626;
+@highlightedBGColor: #666666;
+
+.buttonPlugin.dceCaptionsPluginButton{
+	background-position: -1000% -200%;
+}
+
+/* Seleparate DCE caption plugin ids from default UPV cpation ids*/
+.dceCaptionsBar {
+  input {
+		color: @popup_text_color;
+		background-color: @backgroundColor;
+		width: 49%;
+		margin-bottom: 0px;
+		margin-left: 1px;
+		float: left;
+    border-color: inherit;
+
+    &:focus {
+      border-color: inherit;
+    }
+
+    &:hover {
+      border-color: inherit;
+    }
+  }
+
+	select {
+		width: 39%;
+		display: inline;
+    background-color: @menuBGColor;
+		border: 1px solid #ccc;
+		color: white;
+	    margin-bottom: 0px;
+	    height: 31px;
+	}
+
+	button {
+		float: right;
+		width: 7%;
+		min-height: 30px;
+		min-width: 30px;
+		margin-right: 2px;
+		background: @paella_icons_image;
+		background-position: -900% -200%;
+		background-size: @paella_icons_bkg_size;
+		position: static; /* From UPV https://github.com/polimediaupv/paella/commit/7fc2a5ff13ba9415658d476294d697f925815897 */
+
+		&:hover{
+			background-color: #faa166;
+		}
+	}
+}
+
+#dceCaptionNote{
+  padding-right: 10px;
+  text-align: right;
+  color: #909090;
+  font-style: oblique;
+  font-size:10px;
+}
+
+.dceCaptionsPluginContainer {
+	overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .dceCaptionsPluginContainer {
+    width: 80vw;
+  }
+}
+@media (min-width: 601px) {
+  .dceCaptionsPluginContainer {
+    width: 400px;
+  }
+}
+
+.dceCaptionsBody {
+	max-height: 280px;	
+	overflow-y: scroll;
+	border: 1px solid black;
+  padding-top: 0.2em;	
+
+  .bodyInnerContainer {
+		display: block;
+		height: auto;
+	  padding-top: 0.2em;
+	  padding-bottom: 0.2em;
+	  padding-left: 0.8em;
+	  margin: 0;
+
+  	&:hover {
+			background-color: @highlightedBGColor;
+		}
+
+		&.Highlight {
+		  color: white;
+		  font-size: larger;
+		  padding-left: 0.5em;
+		  padding-top: 0.3em;
+		  padding-bottom: 0.3em;
+		  border: 1px dotted @highlightedBGColor;
+		}			
+  }
+
+
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+}
+::-webkit-scrollbar-button {
+	width: 8px;
+	height:5px;
+}
+::-webkit-scrollbar-track {
+	background:#eee;
+	border: thin solid lightgray;
+	box-shadow: 0px 0px 3px #dfdfdf inset;
+	border-radius:10px;
+}
+::-webkit-scrollbar-thumb {
+	border: thin solid gray;
+	border-radius:10px;
+}
+
+/* CSS OVERLAY */
+
+.CaptionsOnScreen {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	top: 0;
+	left: 0;
+	z-index: 99;
+}
+
+.CaptionsOnScreenInner {
+	background-color: rgba(0,0,0,0.6);
+	position: relative;
+	text-align: center;
+	color: white;
+	font-size: 17px;
+	width: 70%;
+	min-height: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 8px;
+	border-radius: 12px;
+}

@@ -138,19 +138,22 @@
 										if (data.fatal) {
 											switch(data.type) {
 											case Hls.ErrorTypes.NETWORK_ERROR:
-												base.log.error("paella.HLSPlayer: Fatal network error encountered, try to recover");
+												base.log.error("paella.HLSPlayer: Fatal network error encountered, try to recover: " + data.details);
 												This._hls.startLoad();
 												break;
 											case Hls.ErrorTypes.MEDIA_ERROR:
-												base.log.error("paella.HLSPlayer: Fatal media error encountered, try to recover");
+												base.log.error("paella.HLSPlayer: Fatal media error encountered, try to recover :" + data.details);
 												This._hls.recoverMediaError();
 												break;
 											default:
-												base.log.error("paella.HLSPlayer: Fatal Error. Can not recover");
+												base.log.error("paella.HLSPlayer: Fatal Error. Can not recover: " + data.details);
 												This._hls.destroy();
 												reject(new Error("invalid media"));
 												break;
 											}
+										} else {
+											// #DCE OPC-374 DEBUG log non-fatal errors
+											base.log.debug("paella.HLSPlayer: Error '" + data.type + "': " + data.details);
 										}
 									});
 									This._hls.on(Hls.Events.MANIFEST_PARSED,function() {

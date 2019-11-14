@@ -19,7 +19,7 @@
 	class LoaderContainer extends paella.DomNode {
 	
 		constructor(id) {
-			super('div',id,{position:'fixed',backgroundColor:'white',opacity:'0.7',top:'0px',left:'0px',right:'0px',bottom:'0px',zIndex:10000});
+			super('div',id,{position:'fixed',backgroundColor:'black',opacity:'0.7',top:'0px',left:'0px',right:'0px',bottom:'0px',zIndex:10000});
 			this.timer = null;
 			this.loader = null;
 			this.loaderPosition = 0;
@@ -27,29 +27,40 @@
 			this.loader = this.addNode(new paella.DomNode('i','',{
 				width: "100px",
 				height: "100px",
-				color: "black",
+				color: "white",
 				display: "block",
-				marginLeft: "auto",
-				marginRight: "auto",
-				marginTop: "32%",
 				fontSize: "100px",
+				/*  #DCE OPC-374 Center spinner in middle of visible window */
+				left: "40%",
+				top: "40%",
+				position: "absolute"
 			}));
 			this.loader.domElement.className = "icon-spinner";
 	
 			paella.events.bind(paella.events.loadComplete,(event,params) => { this.loadComplete(params); });
-			this.timer = new base.Timer((timer) => {
-				//thisClass.loaderPosition -= 128;
-				
-				//thisClass.loader.domElement.style.backgroundPosition = thisClass.loaderPosition + 'px';
-				this.loader.domElement.style.transform = `rotate(${ this.loaderPosition }deg`;
-				this.loaderPosition+=45;
-			},250);
+			this.timer = this.makeRotateTimer();
 			this.timer.repeat = true;
+		}
+
+		//#DCE OPC-407 re-use this during seeks
+		makeRotateTimer() {
+		  return new base.Timer(timer => {
+		    //thisClass.loader.domElement.style.backgroundPosition = thisClass.loaderPosition + 'px';
+		    this.loader.domElement.style.transform = `rotate(${ this.loaderPosition }deg`;
+		    this.loaderPosition+=45;
+		  },250);
 		}
 	
 		loadComplete(params) {
 			$(this.domElement).hide();
 			this.timer.repeat = false;
+		}
+
+		//#DCE OPC-407 seek load
+		seekload(params) {
+		  $(this.domElement).show();
+		  this.timer = this.makeRotateTimer();
+		  this.timer.repeat = true;
 		}
 	}
 

@@ -5,7 +5,8 @@ paella.addPlugin(function() {
 		getAlignment() { return 'right'; }
 		getSubclass() { return "showMultipleQualitiesPlugin"; }
 		getIconClass() { return 'icon-screen'; }
-		getIndex() { return 2030; }
+                // #DCE OPC-374 overriding the index to reposition the button
+		getIndex() { return 100; }
 		getName() { return "es.upv.paella.multipleQualitiesPlugin"; }
 		getDefaultToolTip() { return base.dictionary.translate("Change video quality"); }
 		

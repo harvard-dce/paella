@@ -103,6 +103,7 @@ paella.addPlugin(function() {
 	
 		endVideo() {
 			this.isPlaying = false;
+			this.showIcon = true; //#DCE OPC-407, Ref https://github.com/polimediaupv/paella/pull/450
 			this.checkStatus();
 		}
 	

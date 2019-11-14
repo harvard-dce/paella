@@ -1,4 +1,4 @@
-//paella.plugins.PlayPauseButtonPlugin = Class.create(paella.ButtonPlugin, {
+/** #DCE Overriding playbutton.js for checkEnabled override for live stream events */
 paella.addPlugin(function() {
 	return class PlayPauseButtonPlugin extends paella.ButtonPlugin {
 		constructor() {
@@ -17,7 +17,9 @@ paella.addPlugin(function() {
 		getIndex() { return 110; }
 	
 		checkEnabled(onSuccess) {
-			onSuccess(true);
+			//onSuccess(true);
+			// #DCE OPC-374 disable play-pause button for live
+			onSuccess(!paella.player.isLiveStream());
 		}
 	
 		setup() {
@@ -42,7 +44,7 @@ paella.addPlugin(function() {
 				this.setToolTip(paella.dictionary.translate("Play"));
 			});
 		}
-	
+
 		action(button) {
 			paella.player.videoContainer.paused()
 				.then(function(paused) {

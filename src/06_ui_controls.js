@@ -14,6 +14,7 @@
 	permissions and limitations under the License.
 */
 
+/* #DCE Override for embed control bar alignment and CS50 flexbox style*/
 
 (() => {
 
@@ -120,8 +121,11 @@ class PlaybackBar extends paella.DomNode {
 		$(playbackFull.domElement).bind('mouseup',function(event) { paella.utils.mouseManager.up(event); });
 
 		if (paella.player.isLiveStream()) {
-			$(this.domElement).hide();
-		}
+			// #DCE start, need CS50 inline playback bar to take up space during live event
+      // $(this.domElement).hide();
+			$(this.domElement).css("visibility", "hidden");
+			// #DCE end, swapped paella5's jQuery ".hide()" (display:none) for DCE CS50's visibility hidden
+    }
 
 		paella.events.bind(paella.events.seekAvailabilityChanged, (e,data) => {
 			if (data.enabled) {
@@ -557,9 +561,12 @@ class PlaybackControl extends paella.DomNode {
 		this.pluginsContainer = new paella.DomNode('div',id + '_playbackBarPlugins');
 		this.pluginsContainer.domElement.className = 'playbackBarPlugins';
 		this.pluginsContainer.domElement.setAttribute("role", "toolbar");
-		this.addNode(this.pluginsContainer);
+		// #DCE start embedd the playbackbar into the plugin listing for flex display
+		this.pluginsContainer.addNode(new paella.PlaybackBar(this.playbackBarId));
 
-		this.addNode(new paella.PlaybackBar(this.playbackBarId));
+		this.addNode(this.pluginsContainer);
+		// this.addNode(new paella.PlaybackBar(this.playbackBarId));
+		// #DCE end flexify the playback bar
 
 		paella.pluginManager.setTarget('button',this);
 
@@ -590,7 +597,30 @@ class PlaybackControl extends paella.DomNode {
 	showPopUp(identifier,button) {
 		this.popUpPluginContainer.showContainer(identifier,button);
 		this.timeLinePluginContainer.showContainer(identifier,button);
+		this.hideCrossTimelinePopupButtons(identifier, this.popUpPluginContainer, this.timeLinePluginContainer);
 	}
+
+	// #DCE OPC-407 close popups across popup type:
+	// hide popUpPluginContainer popups when timeLinePluginContainer popup is active and visa versa
+	hideCrossTimelinePopupButtons(identifier, popupContainer, timelineContainer) {
+		var container = popupContainer.containers[identifier];
+		var prevContainer = timelineContainer.containers[timelineContainer.currentContainerId];
+		if (container && prevContainer) {
+		  prevContainer.button.className = prevContainer.button.className.replace(' selected', '');
+		  paella.events.trigger(paella.events.hidePopUp, {
+		    container: prevContainer
+		  });
+		  prevContainer.plugin.willHideContent();
+		  $(prevContainer.element).hide();
+		  prevContainer.plugin.didHideContent();
+		  return;
+		}
+		container = timelineContainer.containers[identifier];
+		prevContainer = popupContainer.containers[popupContainer.currentContainerId];
+		if (container && prevContainer) {
+        popupContainer.hideContainer(prevContainer.identifier);
+		}
+	} // #DCE end closing popups across popup type
 
 	hidePopUp(identifier,button) {
 		this.popUpPluginContainer.hideContainer(identifier,button);
@@ -599,7 +629,10 @@ class PlaybackControl extends paella.DomNode {
 
 	playbackBar() {
 		if (this.playbackBarInstance==null) {
-			this.playbackBarInstance = this.getNode(this.playbackBarId);
+			//#DCE start embedded
+			// this.playbackBarInstance = this.getNode(this.playbackBarId);
+			this.playbackBarInstance = this.pluginsContainer.getNode(this.playbackBarId);
+			//#DCE end embedded
 		}
 		return this.playbackBarInstance;
 	}
@@ -619,7 +652,10 @@ class PlaybackControl extends paella.DomNode {
 			}
 		}
 
-		this.getNode(this.playbackBarId).onresize();
+		// #DCE start embed playback bar for flex sizing
+		//this.getNode(this.playbackBarId).onresize();
+		this.pluginsContainer.getNode(this.playbackBarId).onresize();
+		// #DCE end embed playback bar for flex sizing
 	}
 }
 
@@ -741,7 +777,10 @@ class ControlsContainer extends paella.DomNode {
 		function hideIfNotCanceled() {
 			if (This._doHide) {
 				$(This.domElement).css({opacity:0.0});
-				$(This.domElement).hide();
+				// #DCE MATT-1595, already transaprent, leave width alone (no hide!)
+				// fix for staggered control bar plugin display
+				// $(This.domElement).hide();
+				// #DCE MATT-1595 end
 				This.domElement.setAttribute('aria-hidden', 'true');
 				This._hidden = true;
 				paella.events.trigger(paella.events.controlBarDidHide);

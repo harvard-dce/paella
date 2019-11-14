@@ -13,7 +13,7 @@
 	or implied. See the License for the specific language governing
 	permissions and limitations under the License.
 */
-
+/* #DCE OPC-407 override inherited class for SaverPlugIn from FastLoad to EarlyLoad so the videos will be initialized to avoid undefined errors */
 
 (function(){
 
@@ -37,7 +37,9 @@ var userTrackingManager = {
 paella.userTracking = {};
 userTrackingManager.initialize();
 
-class SaverPlugIn extends paella.FastLoadPlugin {
+
+  // #DCE OPC-407 load user tracking saver plugin after video elements are set (i.e. EarlyLoad versus FastLoad)
+  class SaverPlugIn extends paella.EarlyLoadPlugin {
 	get type() { return 'userTrackingSaverPlugIn'; }
 	getIndex() { return -1; }
 	checkEnabled(onSuccess) { onSuccess(true); }
