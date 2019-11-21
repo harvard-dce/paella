@@ -277,22 +277,6 @@ class VideoContainerBase extends paella.DomNode {
 				paella.player.controls.restartHideTimer();
 			}
 		});
-
-		let endedTimer = null;
-		let thisClass = this; // #DCE OPC-407
-		paella.events.bind(paella.events.endVideo,(event) => {
-		  // #DCE OPC-407 make sure state is paused and set to 0 time
-		  thisClass.pause();
-		  thisClass.seekToTime(0);
-
-			if (endedTimer) {
-				clearTimeout(endedTimer);
-				endedTimer = null;
-			}
-			endedTimer = setTimeout(() => {
-				paella.events.trigger(paella.events.ended);
-			}, 1000);
-		});
 	}
 
 	get seekDisabled() { return this._seekDisabled; }
@@ -370,6 +354,13 @@ class VideoContainerBase extends paella.DomNode {
 	    base.log.debug(`HTML5: Video synch disabled for iPhone, not synching Videos`);
 	    return;
 	  }
+
+	  if (!paella.player.videoContainer.masterVideo()) {
+	    // #DCE OPC-420
+	    base.log.debug(`There was an existing ERROR loading videos for this mp! At least 1 video should have been found by this point and was not.`);
+	    return;
+	  }
+
 	  // #DCE OPC-407 synch videos not matching the master
 	  paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
 		  let currentTime = videoData.currentTime;
@@ -661,6 +652,22 @@ class VideoContainerBase extends paella.DomNode {
 
 	onresize() { super.onresize(onresize);
 	}
+
+	// #DCE UPV video end fix made Nov 18, 2019: https://github.com/polimediaupv/paella/blob/17aade865
+	ended() {
+		return new Promise((resolve) => {
+			let duration = 0;
+			this.duration()
+				.then((d) => {
+					duration = d;
+					return this.currentTime();
+				})
+				.then((currentTime) => {
+					resolve(Math.floor(duration) <= Math.ceil(currentTime));
+				});
+		});
+	}
+
 }
 
 paella.VideoContainerBase = VideoContainerBase;
@@ -947,14 +954,23 @@ class VideoContainer extends paella.VideoContainerBase {
 		this._audioTag = paella.player.config.player.defaultAudioTag ||
 						 paella.dictionary.currentLanguage();
 		this._audioPlayer = null;
-		this._volume = 1;
+		this._volume = paella.utils.cookies.get("volume") ? Number(paella.utils.cookies.get("volume")) : 1;  // #DCE from UPV Paella 6.3 commit 877805282b0
 	}
 
 	// Playback and status functions
 	play() {
 		return new Promise((resolve,reject) => {
-			this.streamProvider.startTime = this._startTime;
-			this.streamProvider.callPlayerFunction('play')
+			this.ended() 	// #DCE end video fix UPV-develop https://github.com/polimediaupv/paella/commit/17aade8657966b8572c921d14dcb2233294a1962
+				.then((ended) => {
+					if (ended) {
+						this._streamProvider.startTime = 0;
+						this.seekToTime(0);
+					}
+					else {
+						this.streamProvider.startTime = this._startTime;
+					}
+					return this.streamProvider.callPlayerFunction('play')
+				})
 				.then(() => {
 					super.play();
 					resolve();
@@ -1064,6 +1080,7 @@ class VideoContainer extends paella.VideoContainerBase {
 		}
 		else {
 			return new Promise((resolve,reject) => {
+			 paella.utils.cookies.set("volume",params); // #DCE from UPV Paella 6.3 commit 877805282b0
 				this._audioPlayer.setVolume(params)
 					.then(() => {
 						paella.events.trigger(paella.events.setVolume, { master:params });
@@ -1245,6 +1262,7 @@ class VideoContainer extends paella.VideoContainerBase {
 		var hashParamTime = base.hashParams.get("time");
 		var timeString = hashParamTime ? hashParamTime:urlParamTime ? urlParamTime:"0s";
 		var startTime = paella.utils.timeParse.timeToSeconds(timeString);
+		var self = this; // #DCE OPC-242
 		if (startTime) {
 			this._startTime = startTime;
 		}
@@ -1295,6 +1313,17 @@ class VideoContainer extends paella.VideoContainerBase {
 
 				.then(() => {
 					let endedTimer = null;
+					let setupEndEventTimer = () => {
+						// #DCE end video fix UPV-develop https://github.com/polimediaupv/paella/commit/17aade8657966b8572c921d14dcb2233294a1962
+						this.stopTimeupdate();
+						if (endedTimer) {
+							clearTimeout(endedTimer);
+							endedTimer = null;
+						}
+						endedTimer = setTimeout(() => {
+							paella.events.trigger(paella.events.ended);
+						}, 1000);
+					}
 					let eventBindingObject = this.masterVideo().video || this.masterVideo().audio;
 					$(eventBindingObject).bind('timeupdate', (evt) => {
 						this.trimming().then((trimmingData) => {
@@ -1304,22 +1333,16 @@ class VideoContainer extends paella.VideoContainerBase {
 								current -= trimmingData.start;
 								duration = trimmingData.end - trimmingData.start;
 							}
-							paella.events.trigger(paella.events.timeupdate, { videoContainer:this, currentTime:current, duration:duration });
 							if (current>=duration) {
-								// #DCE OPC-407 log end of video
-								base.log.debug(`HTML5: end of video, about to pause and set all times to 0: currentTime=${current}, duration=${duration}`);
 								this.streamProvider.callPlayerFunction('pause');
-								this.streamProvider.callPlayerFunction('setCurrentTime', 0); // #DCE OPC-407 mimic 5x
-
-								if (endedTimer) {
-									clearTimeout(endedTimer);
-									endedTimer = null;
-								}
-								endedTimer = setTimeout(() => {
-									paella.events.trigger(paella.events.ended);
-								}, 1000);
+								setupEndEventTimer();
 							}
 						})
+					});
+
+					paella.events.bind(paella.events.endVideo,(event) => {
+						// #DCE end video fix UPV-develop https://github.com/polimediaupv/paella/commit/17aade8657966b8572c921d14dcb2233294a1962
+						setupEndEventTimer();
 					});
 
 					this._ready = true;
@@ -1352,6 +1375,9 @@ class VideoContainer extends paella.VideoContainerBase {
 
 	resizeLandscape() {
 		var height = (paella.player.isFullScreen() == true) ? $(window).height() : $(this.domElement).height();
+		if (base.userAgent.system.iPhone && window) { // #DCE OPC-425 iPhone in landscape with tabs
+			height = window.innerHeight;
+		}
 		var relativeSize = new paella.RelativeVideoSize();
 		var width = relativeSize.proportionalWidth(height);
 		this.container.domElement.style.width = width + 'px';
@@ -1365,6 +1391,12 @@ class VideoContainer extends paella.VideoContainerBase {
 		var aspectRatio = relativeSize.aspectRatio();
 		var width = (paella.player.isFullScreen() == true) ? $(window).width() : $(this.domElement).width();
 		var height = (paella.player.isFullScreen() == true) ? $(window).height() : $(this.domElement).height();
+
+		if (base.userAgent.system.iPhone && window) { // #DCE OPC-425 iPhone in landscape with tabs
+			width = window.innerWidth;
+			height = window.innerHeight;
+		}
+
 		var containerAspectRatio = width/height;
 
 		if (containerAspectRatio>aspectRatio) {

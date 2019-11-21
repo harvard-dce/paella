@@ -116,6 +116,15 @@ class PlaybackBar extends paella.DomNode {
 			$(this.domElement).bind('mousemove',function(event) { thisClass.movePassive(event); paella.utils.mouseManager.move(event); });
 			$(playbackFull.domElement).bind('mousemove',function(event) { paella.utils.mouseManager.move(event); });
 			$(this.domElement).bind("mouseout",function(event) { thisClass.mouseOut(event); });
+
+		} else {
+
+			// #DCE OPC-415 remove divTimeImageOverlay on mobile devices
+			$(this.domElement).on("touchmove touchend touchcancel", function (event) {
+				base.log.debug(`Playback bar touch event '${event}'`);
+				thisClass.mouseOut(event);
+			});
+
 		}
 		$(this.domElement).bind('mouseup',function(event) { paella.utils.mouseManager.up(event); });
 		$(playbackFull.domElement).bind('mouseup',function(event) { paella.utils.mouseManager.up(event); });

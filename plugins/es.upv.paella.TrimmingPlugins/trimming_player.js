@@ -1,3 +1,5 @@
+/* #DCE OPC-419 override TrimmingLoaderPlugin for the start-end param enable trimming */
+
 paella.addPlugin(function() {
 
 
@@ -32,15 +34,16 @@ paella.addPlugin(function() {
 					paella.player.videoContainer.setTrimming(data.start, data.end)
 						.then(() => {})
 					
-				}
-				else {
+				} else {
+
+					// #DCE OPC-417 fix start and end param trimming triggers
 					// Check for optional trim 'start' and 'end', in seconds, in location args
 					var startTime =  base.parameters.get('start');
 					var endTime = base.parameters.get('end');
 					if (startTime && endTime) {
-						paella.player.videoContainer.setTrimming(startTime, endTime).then(function() {
-							return paella.player.videoContainer.enableTrimming();
-						});
+						paella.player.videoContainer.enableTrimming();
+						paella.player.videoContainer.setTrimming(startTime, endTime)
+							.then(() => {})
 					}
 				}
 			});

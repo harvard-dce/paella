@@ -30,10 +30,10 @@
 				color: "white",
 				display: "block",
 				fontSize: "100px",
-				/*  #DCE OPC-374 Center spinner in middle of visible window */
-				left: "40%",
+				/*  #DCE OPC-374 Center spinner in middle of visible window, OPC-419 retry align */
+				margin: "auto",
 				top: "40%",
-				position: "absolute"
+				position: "relative"
 			}));
 			this.loader.domElement.className = "icon-spinner";
 	

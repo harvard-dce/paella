@@ -102,6 +102,9 @@ paella.addPlugin(function() {
 				this.updateClass();
 			});
 
+			// #DCE OPC-419 from UPV upstream commit 67db370  (in UPV Paellav6.3.x)
+			this.updateClass();
+
 			return rangeInput;
 		}
 
