@@ -362,8 +362,14 @@ class VideoContainerBase extends paella.DomNode {
 	  }
 
 	  // #DCE OPC-407 synch videos not matching the master
-	  paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
-		  let currentTime = videoData.currentTime;
+	  let currentTrimmedTimeToSeek = 0;
+	  paella.player.videoContainer.currentTime()
+	  .then((currentTrimmedTime) => {
+			 currentTrimmedTimeToSeek = currentTrimmedTime;
+			 return paella.player.videoContainer.masterVideo().getVideoData();
+			})
+			.then((videoData) => {
+	  let currentTime = currentTrimmedTimeToSeek;
 			let streams = paella.player.videoContainer.streamProvider.videoPlayers;
 			let promises = [];
 			let updated = [];
@@ -959,17 +965,26 @@ class VideoContainer extends paella.VideoContainerBase {
 
 	// Playback and status functions
 	play() {
-		return new Promise((resolve,reject) => {
-			this.ended() 	// #DCE end video fix UPV-develop https://github.com/polimediaupv/paella/commit/17aade8657966b8572c921d14dcb2233294a1962
-				.then((ended) => {
+		return new Promise((resolve, reject) => {
+			this.ended() // #DCE end video fix UPV-develop https://github.com/polimediaupv/paella/commit/17aade8657966b8572c921d14dcb2233294a1962
+				.then(ended => {
 					if (ended) {
 						this._streamProvider.startTime = 0;
-						this.seekToTime(0);
-					}
-					else {
+						let promises = [];
+						// this.seekToTime(0);
+						// #DCE add end promise on the UPV patch to wait for the seek to end before playing
+						let streams = paella.player.videoContainer.streamProvider.videoPlayers;
+						this._streamProvider.videoPlayers.forEach(v => {
+						promises.push(v.setCurrentTime(this._streamProvider.startTime));
+					});
+						Promise.all(promises).then(() => {
+						return this.streamProvider.callPlayerFunction('play');
+						});
+					} else {
 						this.streamProvider.startTime = this._startTime;
+						return this.streamProvider.callPlayerFunction('play');
 					}
-					return this.streamProvider.callPlayerFunction('play')
+					// #DCE end promise update
 				})
 				.then(() => {
 					super.play();
