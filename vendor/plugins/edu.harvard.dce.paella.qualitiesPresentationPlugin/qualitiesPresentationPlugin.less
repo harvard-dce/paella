@@ -1,0 +1,46 @@
+.buttonPlugin.showMultipleQualitiesPlugin {
+	text-align: center;
+	background-position: -600% -100%;
+	font-size: 0.8em;
+	line-height: @playbackBarButtonHeightPx;
+}
+
+.buttonPluginPopUp.showMultipleQualitiesPlugin {
+	background-image:none;
+}
+
+.selectQuality {
+	padding: 10px;
+}
+
+.multipleQualityItemDce {
+	font-size: 19px;
+	cursor: pointer;
+	border-bottom: 1px solid #282828;
+	border-top: 1px solid #444;
+	white-space: nowrap;
+	font-size: 1em;
+  padding: 0 0.25em;
+}
+
+#SINGLESTREAM_button, #MULTISTREAM_button {
+	color: #888;
+	cursor: default;
+}
+
+#SINGLESTREAM_button:hover, #MULTISTREAM_button:hover {
+	cursor: default;
+}
+
+.multipleQualityItemDce:hover {
+	background-color: @hoverBackgroundColor;
+}
+
+.multipleQualityItemDce.selected {
+	/* color:@mainColor; */
+  color: #51c0ff;
+}
+
+.multipleQualityItemDce.selected:hover {
+	color:@popup_text_color;
+}

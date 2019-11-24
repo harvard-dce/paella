@@ -72,12 +72,14 @@ paella.addPlugin(function() {
 			repaintCanvas();
 		}
 	
-		getEvents() {
-			return [paella.events.endVideo,paella.events.play,paella.events.pause,paella.events.showEditor,paella.events.hideEditor];
+		getEvents() { // #DCE OPC-240 show play button on screen after video ends with trimming
+			return [paella.events.ended, paella.events.endVideo,paella.events.play,
+				paella.events.pause,paella.events.showEditor,paella.events.hideEditor];
 		}
 	
 		onEvent(eventType,params) {
 			switch (eventType) {
+				case paella.events.ended:
 				case paella.events.endVideo:
 					this.endVideo();
 					break;
@@ -103,6 +105,7 @@ paella.addPlugin(function() {
 	
 		endVideo() {
 			this.isPlaying = false;
+			this.showIcon = true; //#DCE OPC-407, Ref https://github.com/polimediaupv/paella/pull/450
 			this.checkStatus();
 		}
 	

@@ -13,6 +13,12 @@
 	or implied. See the License for the specific language governing
 	permissions and limitations under the License.
 */
+/*
+ * #DCE OPC-407 overriding 09_paella_player UPV 6.2.2 goFullScreen() to revert it to Paella5x version of only checking iOS.
+ * Removing the "&& (paella.utils.userAgent.browser.Version.major < 12 || !paella.utils.userAgent.system.iPad)"
+ * Because it prevents fullscreen for FireFox and Chrome for iOS iPad.
+ * NOTE: DCE config disables reload on full screen, the possible reason that fullsreen is working on iPad < 13. *Still in test for iOS 13 iPad*
+ */
 
 (() => {
 	class PaellaPlayer extends paella.PlayerBase {
@@ -88,10 +94,8 @@
 
 		goFullScreen() {
 			if (!this.isFullScreen()) {
-				if (base.userAgent.system.iOS &&
-					(paella.utils.userAgent.browser.Version.major<12 ||
-					 !paella.utils.userAgent.system.iPad))
-				{
+				// #DCE OPC-407 revert to UPV Paella 5x
+				if (base.userAgent.system.iOS) {
 					paella.player.videoContainer.masterVideo().goFullScreen();
 				}
 				else {			

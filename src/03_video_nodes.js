@@ -14,6 +14,8 @@
 	permissions and limitations under the License.
 */
 
+/* #DCE OPC-374, OPC-357 MATT-2502 override default video rectangle dimensions to fit extra wide live combo (still needed in Paella v6.2.0)*/
+/* #DCE OPC-407 override setCurrent time and more video event debug logs */
 (() => {
 
 paella.Profiles = {
@@ -79,22 +81,42 @@ class RelativeVideoSize {
 	set h(v) { this._h = v; }
 	
 	proportionalHeight(newWidth) {
+		// #DCE MATT-liveSizeWindow
+		if (paella.dce && paella.dce.relativeVideoSize) {
+			return Math.floor(paella.dce.relativeVideoSize.h * newWidth / paella.dce.relativeVideoSize.w);
+		}
 		return Math.floor(this.h * newWidth / this.w);
 	}
 
 	proportionalWidth(newHeight) {
+		// #DCE MATT-liveSizedWindow
+		if (paella.dce && paella.dce.relativeVideoSize) {
+			return Math.floor(paella.dce.relativeVideoSize.w * newHeight / paella.dce.relativeVideoSize.h);
+		}
 		return Math.floor(this.w * newHeight / this.h);
 	}
 
 	percentVSize(pxSize) {
+		// #DCE MATT-liveSizedWindow
+		if (paella.dce && paella.dce.relativeVideoSize) {
+			return pxSize * 100 / paella.dce.relativeVideoSize.h;
+		}
 		return pxSize * 100 / this.h;
 	}
 
 	percentWSize(pxSize) {
+		// #DCE MATT-liveSizedWindow
+		if (paella.dce && paella.dce.relativeVideoSize) {
+			return pxSize * 100 / paella.dce.relativeVideoSize.w;
+		}
 		return pxSize * 100 / this.w;
 	}
 
 	aspectRatio() {
+		// #DCE MATT-liveSizedWindow
+		if (paella.dce && paella.dce.relativeVideoSize) {
+			return paella.dce.relativeVideoSize.w / paella.dce.relativeVideoSize.h;
+		}
 		return this.w/this.h;
 	}
 }
@@ -736,12 +758,15 @@ class Html5Video extends paella.VideoElementBase {
 	constructor(id,stream,left,top,width,height,streamName) {
 		super(id,stream,'video',left,top,width,height);
 
-		this._posterFrame = null;
+		/* #DCE OPC-374 if super (i.e. VideoBase) set value to poster frame, use that value */
+		this._posterFrame = this._posterFrame || null;
 		this._currentQuality = null;
 		this._autoplay = false;
 
 		this._streamName = streamName || 'mp4';
 		this._playbackRate = 1;
+		// #DCE OPC-407 the seeking state of this player (ref videoContainer's _isSeekingCount)
+		this._isSeeking = false;
 
 		if (this._stream.sources[this._streamName]) {
 			this._stream.sources[this._streamName].sort(function (a, b) {
@@ -756,7 +781,7 @@ class Html5Video extends paella.VideoElementBase {
 		function onProgress(event) {
 			if (!this._ready && this.video.readyState==4) {
 				this._ready = true;
-				if (this._initialCurrentTipe!==undefined) {
+				if (this._initialCurrentTime!==undefined) {
 					this.video.currentTime = this._initialCurrentTime;
 					delete this._initialCurrentTime;
 				}
@@ -764,6 +789,10 @@ class Html5Video extends paella.VideoElementBase {
 			}
 		}
 
+		// #DCE OPC-407 utility log
+		this.debugEventVideoStatus = (event) => {
+			base.log.debug(`HTML5: video event '${event}' on '${this.stream.content}' (${this._identifier})  videoSeekingFlag = ${this._isSeeking}`);
+		}
 
 		let evtCallback = (event) => { onProgress.apply(this,[event]); }
 
@@ -776,22 +805,55 @@ class Html5Video extends paella.VideoElementBase {
 		// Save current time to resume video
 		$(this.video).bind('timeupdate', (evt) => {
 			this._resumeCurrentTime = this.video.currentTime;
+			this.debugEventVideoStatus('timeupdate');
 		});
 
 		$(this.video).bind('ended',(evt) => {
 			paella.events.trigger(paella.events.endVideo);
+			this.debugEventVideoStatus('ended');
 		});
 
 		$(this.video).bind('emptied', (evt) => {
-			if (this._resumeCurrentTime && !isNaN(this._resumeCurrentTime)) {
+		  // #DCE OPC-407
+			if ((this._resumeCurrentTime == 0 || this._resumeCurrentTime) && !isNaN(this._resumeCurrentTime)) {
 				this.video.currentTime = this._resumeCurrentTime;
 			}
+			this.debugEventVideoStatus('emptied');
+		});
+
+		// #DCE OPC-407
+		$(this.video).bind('seeking', evt => {
+			this._isSeeking = true; // set seek flag for video
+			this.debugEventVideoStatus('seeking');
+		});
+		$(this.video).bind('seeked', evt => {
+			this._isSeeking = false; // update seek flag for video
+			this.debugEventVideoStatus('seeked');
+		});
+		$(this.video).bind('stalled', evt => { // failed to fetch data, but still trying
+			this.debugEventVideoStatus('stalled');
+		});
+		$(this.video).bind('waiting', evt => {
+			this.debugEventVideoStatus('waiting');
+		});
+		$(this.video).bind('suspend', evt => {
+		  this.debugEventVideoStatus('suspend');
+		});
+		$(this.video).bind('loadeddata', evt => {
+		  this._isSeeking = false; // make sure seek flag is off
+		  this.debugEventVideoStatus('loadeddata');
+		});
+		$(this.video).bind('durationchange', evt => {
+		  // #DCE OPC-407 might happen during a seek?
+		  this.debugEventVideoStatus('durationchange');
 		});
 		
-		// Fix safari setQuelity bug
+		// Fix safari setQuality bug (UPV)
 		if (paella.utils.userAgent.browser.Safari) {
 			$(this.video).bind('canplay canplaythrough', (evt) => {
-				this._resumeCurrentTime && (this.video.currentTime = this._resumeCurrentTime);
+				(this._resumeCurrentTime == 0 || this._resumeCurrentTime) && (this.video.currentTime = this._resumeCurrentTime);
+				this._isSeeking = false; // #DCE OPC-407 make sure seek flag is off
+				this.debugEventVideoStatus('canplay canplaythrough');
 			});
 		}
 	}
@@ -804,7 +866,12 @@ class Html5Video extends paella.VideoElementBase {
 			this.video.currentTime==this.video.duration &&
 			this.video.readyState==2)
 		{
+			// #DCE OPC-407 log verification of call from FF
+			base.log.debug(`DCE Firefox end of video check: currentTime=${this.video.currentTime}, duration=${this.video.duration}, readyState=${this.video.readyState}`);
 			this.video.currentTime = 0;
+		}
+		if (this.video.currentTime > this.video.duration) {
+		  console.log(`DCE WARNING end of video check currentTime=${this.video.currentTime} is greater than duration=${this.video.duration}, readyState=${this.video.readyState}`);
 		}
 
 		return this.video.readyState>=3;
@@ -828,6 +895,8 @@ class Html5Video extends paella.VideoElementBase {
 			}
 			else {
 				$(this.video).bind('canplay',() => {
+				  // #DCE OPC-407, ensure ready state is set
+				  this._ready = true;
 					processResult(action());
 					$(this.video).unbind('canplay');
 				});
@@ -925,18 +994,39 @@ class Html5Video extends paella.VideoElementBase {
 	}
 
 	disable(isMainAudioPlayer) {
-		//if (isMainAudioPlayer) return;
-		//this._isDisabled = true;
-		//this._playState = !this.video.paused;
-		//this.video.pause();
+		// #DCE OPC-393
+		base.log.debug(`PROFILE: About to disabled '${this._identifier}' '${this._stream.content}', isMainAudioPlayer=${isMainAudioPlayer}`);
+		if (isMainAudioPlayer) return;
+		this._isDisabled = true;
+		this._playState = !this.video.paused;
+		this.video.pause();
 	}
 
 	enable(isMainAudioPlayer) {
-		//if (isMainAudioPlayer) return;
-		//this._isDisabled = false;
-		//if (this._playState) {
-		//	this.video.play();
-		//}
+		// #DCE OPC-393
+		base.log.debug(`PROFILE: About to enable '${this._identifier}' '${this._stream.content}', isMainAudioPlayer=${isMainAudioPlayer}`);
+		if (isMainAudioPlayer || !this._isDisabled) return;
+		this._isDisabled = false;
+		let This = this;
+		paella.player.videoContainer.masterVideo().getVideoData().then(function (videoData) {
+		  if (paella.dce && paella.dce.videoDataSingle) videoData = paella.dce.videoDataSingle; // #DCE OPC-407 master toggled so data no good, used saved dce data
+			let currentTime = videoData.currentTime;
+			let paused = videoData.paused;
+			let duration = videoData.duration;
+			let shorttime = parseFloat(currentTime).toFixed(3);
+			// #DCE OPC-401 ensure videos are in synch
+			if (shorttime < 0.1) shorttime = 0.1; //iOS protection
+			paella.player.videoContainer.seekToTime(shorttime);
+			if (paused) {
+				if (This._playState) {
+					base.log.debug(`PROFILE: Video '${This._identifier}' '${This._stream.content}' was playing, but leaving it in paused state like the main video.`);
+				}
+				// and make sure it's really paused
+				This.video.pause();
+			} else {
+				This.video.play();
+			}
+		});
 	}
 
 	getQualities() {
@@ -949,6 +1039,8 @@ class Html5Video extends paella.VideoElementBase {
 					index++;
 					result.push(this._getQualityObject(index,s));
 				});
+				// #DCE OPC-407
+				base.log.debug(`HTML5 Resolving '${result.length}' getQualities for '${this._identifier}'  '${this.stream.content}'`);
 				resolve(result);
 			},10);
 		});
@@ -1025,10 +1117,42 @@ class Html5Video extends paella.VideoElementBase {
 	}
 
 	setCurrentTime(time) {
-		return this._deferredAction(() => {
-			time && !isNaN(time) && (this.video.currentTime = time);
-		});
+	 time = parseFloat(time).toFixed(3); // #DCE OPC-407 simplify for Safari
+	 return new Promise(resolve => {
+	   let paused = this.video.paused;
+	   let currentTime = this.video.currentTime;
+	   let This = this;
+	   base.log.debug(`HTML5: in setCurrentTime for '${this.stream.content}' time '${time}' is already seeking = ${this._isSeeking}`);
+	   let onSeek = function () {
+	     base.log.debug(`HTML5: "seeked" event, before isPaused Test, seekToTime= ${time} '${This.stream.content}'`);
+	     This._isSeeking = false;
+	     This.getVideoData().then(videoData => {
+	       if (!paused) {
+	          // #DCE OPC-407 do not play until all players are seeked.
+	          paella.player.videoContainer.playIfNonAreSeeking(This);
+	       } else {
+	         paella.player.videoContainer._seekingPlayers.delete(This);
+	       }
+	       base.log.debug(`HTML5: setCurrentTime seeked ${time} '${This.stream.content}' is seeking = ${This._isSeeking} number of seeking players ${paella.player.videoContainer._seekingPlayers.size}`);
+	       This.video.removeEventListener('seeked', onSeek, false);
+	       resolve();
+	     });
+	   };
+
+	   if ((!this._isSeeking) && (time === 0 || time) && !isNaN(time)) {
+	     base.log.debug(`HTML5: setting is Seeking to TRUE for '${this.stream.content}' for time ${time}`);
+	     this._isSeeking = true;
+	     paella.player.videoContainer._seekingPlayers.add(this);
+	     this.pause().then(() => {
+	       base.log.debug(`HTML5: setCurrentTime on video element directly: ${time} '${this.stream.content}' was paused = ${paused}, is now paused = ${this.video.paused} currentTime = ${this.video.currentTime}`);
+	       this.video.addEventListener('seeked', onSeek);
+	       // #DCE OPC-407 Warning don't use '"video.fastSeek" here. It creates a target estimate and does not go to requested time in Safari
+	       this.video.currentTime = time;
+	     });
+	   }
+	 });
 	}
+	// #DCE OPC-407 end setCurrentTime
 
 	currentTime() {
 		return this._deferredAction(() => {
@@ -1106,7 +1230,7 @@ class Html5Video extends paella.VideoElementBase {
 
 	unFreeze(){
 		return this._deferredAction(() => {
-			var c = document.getElementById(this.video.id + "canvas");
+			var c = document.getElementById(this._identifier + "canvas");
 			if (c) {
 				$(c).remove();
 			}
@@ -1117,7 +1241,7 @@ class Html5Video extends paella.VideoElementBase {
 		var This = this;
 		return this._deferredAction(function() {
 			var canvas = document.createElement("canvas");
-			canvas.id = This.video.id + "canvas";
+			canvas.id = This._identifier + "canvas";
 			canvas.className = "freezeFrame";
 			canvas.width = This.video.videoWidth;
 			canvas.height = This.video.videoHeight;

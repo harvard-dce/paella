@@ -1,0 +1,295 @@
+/** Style for timed Comments */
+.timedComments{
+  display: flex;
+  flex-direction: column;
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  position: fixed;
+  bottom: 70px;
+  right: 30px;
+  margin-right: 30px;
+  padding: 20px;
+  max-height: 80vh;
+  width:510px;
+  height: 40vh;
+  overflow: hidden;
+  opacity:1;
+  z-index:997;
+  font-size: 14px;
+}
+
+#innerAnnotation {
+  overflow-y: auto;
+  min-height: 0px;
+  flex: 2 1 auto;
+  cursor: auto;
+}
+
+#innerAnnotation form {
+    display: inherit;
+    margin: 0 0 5px;
+}
+
+input.tc_reply_textarea,
+input.tc_comment_textarea {
+  margin-bottom: 0px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  border-right-color:rgba(0, 0, 0, 0.2);
+  border-bottom-color:rgba(0, 0, 0, 0.2);
+}
+
+#dceAnnotUserContainer, #dceAnnotUserPseudoName {
+    color: #909090;
+    font-size: 10px;
+    font-style: oblique;
+    padding-right: 10px;
+    text-align: right;
+}
+
+#dceAnnotUserPseudoName {
+  curson: pointer;
+}
+
+#e28e0130-9824-11e5-88b4-a94245a618ad0:hover{
+  background-color: rgba(0, 0, 0, 0.8);
+}
+#e28e0130-9824-11e5-88b4-a94245a618bnd a{
+  color: rgb(255, 230, 45);
+}
+#e28e0130-9824-11e5-88b4-a94245a618bnd a:visited{
+  color: rgba(255, 255, 150, 0.80);
+}
+
+.form-group > div{
+  display: inline;
+}
+
+#TimedCommentPlugin_Comments:hover{
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: move;
+}
+
+.tc_timestamp_block{
+  display: flex;
+  border-radius: 4px;
+}
+
+.tc_timestamp_block.active {
+    background-color: #A1A1A1;
+}
+
+.tc_timestamp {
+  flex: 0 60px;
+  margin: 4px;
+}
+
+.tc_timestamp:hover {
+  cursor: pointer;
+}
+
+label.tc_comment_isprivate {
+  margin: 2px 2px 2px 0px;
+  font-size: 12px;
+}
+
+.tc_comment_button,
+.tc_comment_isprivate {
+  white-space: nowrap;
+}
+
+#tc_comment_private_checkbox{
+  margin-top: 0px;
+}
+
+.tc_new_reply_form {
+  width: 95%;
+}
+
+.tc_comment_block {
+  flex: 4 5px;
+  border-radius: 4px;
+  margin: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.tc_comment_block:hover {
+  cursor: text;
+}
+
+.tc_comment_block > div {
+  padding-left: 4px;
+}
+
+.tc_comment > input {
+  background-color: #eee;
+  color: black;
+}
+
+.tc_comment {
+  display: flex;
+}
+
+.tc_comment_data {
+  font-style: italic;
+  font-size: 0.85em;
+}
+
+.tc_checkbox {
+  display: inline;
+}
+
+
+.tc_reply:before {
+    content: "»";
+    margin-right: 6px;
+    margin-left: 6px;
+}
+
+/* ------------  new comment row ------ */
+.tc_new_comment{
+  display: inline-flex;
+  margin-top: 10px;
+  background-color: rgba(2, 2, 1, 0.6);
+  border-radius: 4px;
+}
+
+#tc_current_timestamp {
+  display: inline-flex;
+}
+
+.tc_new_comment_form {
+  width: 95%;
+}
+
+/* ------------  end new comment row ------ */
+
+.tc_comment_data div {
+  display: inline-block;
+}
+
+@media all and (min-width: 100px) {
+  .tc_comment_text, .tc_reply_text {
+    flex: 2 0 210px;
+  }
+  .tc_comment_data {
+    flex: 1 0 140px;
+    margin-left: 5px;
+    padding-right: 10px;
+    white-space: nowrap;
+  }
+}
+
+.comment-move-menu {
+    display: none;
+    z-index: 997;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+}
+
+.comment-move-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.comment-move-menu li:hover {
+    background-color: #DEF;
+}
+
+/* ------------------------------------------- */
+/* MATT-2245 Social Tool alias input box style */
+
+#dialog-form-alias {
+  padding: 10px;
+  margin-top: 3px;
+  font-size: 0.9em;
+  z-index: 998;
+  position: relative;
+  overflow: auto;
+  display: inline;
+}
+
+#form-alias {
+  display: block;
+  position: relative;
+  margin: 0 10px 0;
+}
+
+#form-alias > .alias {
+  color: #121212;
+  font-size: 12px;
+  text-shadow: none;
+}
+
+#alias-input-info.alias {
+  margin: auto;
+  font-style: italic;
+  font-size: 10px;
+}
+
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
+
+.ui-dialog-titlebar {
+    display: none;
+}
+
+.ui-widget.alias-prompt {
+    font-family: Verdana,Arial,sans-serif;
+    font-size: .8em;
+}
+
+.ui-widget-content.alias-prompt {
+    background: #f9f9f9 none repeat scroll 0 0;
+    border: 2px solid #eeeeef;
+    border-radius: 3px;
+    color: #222222;
+}
+
+#tc_alias_input {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  display:block;
+  padding: 2px;
+}
+
+#tc_alias_input.text { 
+  width: 95%; 
+  padding: .4em; 
+}
+
+/* extra style for jQuery dialog buttons */
+dialog-form-alias > div.ui-dialog-buttonpane.ui-widget-content.ui-helper-clearfix {
+   color: #121212;
+   background-color: #eeeeef;
+   display: block;
+}
+
+dialog-form-alias > button.ui-button {
+  line-height: 160%;
+  font-weight: bold;
+}
+
+dialog-form-alias > div.ui-dialog-buttonset {
+  padding: 3px;
+  text-align: right;
+}
+
+.ui-dialog-buttonset > button {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 80px;
+  font-size: 12px;
+  color: #121212;
+}

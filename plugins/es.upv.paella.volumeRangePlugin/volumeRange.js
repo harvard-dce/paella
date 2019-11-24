@@ -7,8 +7,8 @@ paella.addPlugin(function() {
 		getName() { return "es.upv.paella.volumeRangePlugin"; }
 		//getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
 		getDefaultToolTip() { return base.dictionary.translate("Volume"); }
-		getIndex() {return 120;}
-		getAriaLabel() { return base.dictionary.translate("Volume"); }
+		getIndex() {return 220;} //#DCE OPC-374 allow the expand in-line but mitigate impact by only pushing scrub bar
+		getAriaLabel() { return base.dictionary.translate("Volume"); } //#DCE OPC-374 keep arial label, button element added to DCE CS50 flex style
 
 		
 		//closeOnMouseOut() { return true; }
@@ -101,6 +101,9 @@ paella.addPlugin(function() {
 				rangeInput.value = params.master;
 				this.updateClass();
 			});
+
+			// #DCE OPC-419 from UPV upstream commit 67db370  (in UPV Paellav6.3.x)
+			this.updateClass();
 
 			return rangeInput;
 		}

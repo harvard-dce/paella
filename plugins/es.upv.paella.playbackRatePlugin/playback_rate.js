@@ -25,7 +25,8 @@ paella.addPlugin(function() {
 
 		setup() {
 			this.defaultRate = 1.0;
-			this.available_rates = this.config.availableRates || [0.75, 1, 1.25, 1.5];
+                        // #DCE OPC-374 adding 2x rate in situ, the Add2xPlaybackChoice plugin doesn't work for this
+			this.available_rates = this.config.availableRates || [0.75, 1, 1.25, 1.5, 2];
 		}
 
 		buildContent(domElement) {

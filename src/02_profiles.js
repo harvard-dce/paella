@@ -1,3 +1,4 @@
+/*  #DCE OPC-407 overriding for debug log lines */
 (function() {
     let g_profiles = [];
 
@@ -198,6 +199,7 @@
             let profile = getProfile(streamData.content);
             let player = this.streamProvider.videoPlayers[index];
             let videoWrapper = this.videoWrappers[index];
+            base.log.debug(`PROFILE: checking video '${streamData.content}', player '${player._stream.content}', profile '${profile}'`);
             if (profile) {
                 player.getVideoData()
                     .then((data) => {
